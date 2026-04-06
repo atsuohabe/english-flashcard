@@ -35,17 +35,24 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.card--flipped {
+.card--flipped,
+.card.is-flipped {
   transform: rotateY(180deg);
 }
 
 /* Swipe animations */
-.card--swipe-right {
+.card--swipe-right,
+.card.dismiss-right {
   animation: slideOutRight 400ms ease forwards;
 }
 
-.card--swipe-left {
+.card--swipe-left,
+.card.dismiss-left {
   animation: slideOutLeft 400ms ease forwards;
+}
+
+.card.is-dragging {
+  cursor: grabbing;
 }
 
 .card--enter {
@@ -539,4 +546,215 @@
   color: var(--color-text-muted);
   margin-bottom: var(--space-6);
   max-width: 300px;
+}
+
+/* ===== Card Front/Back Layouts (used by flashcard.js) ===== */
+.card__front,
+.card__back {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  gap: var(--space-3);
+}
+
+.card__front-meta {
+  position: absolute;
+  top: var(--space-4);
+  left: var(--space-4);
+  right: var(--space-4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card__badge {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--color-text-subtle);
+  background: var(--color-primary-light);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.card__number {
+  font-size: 0.75rem;
+  color: var(--color-text-subtle);
+  font-variant-numeric: tabular-nums;
+}
+
+.card__hint {
+  position: absolute;
+  bottom: var(--space-4);
+  font-size: 0.75rem;
+  color: var(--color-text-subtle);
+}
+
+.card__example-hanzi {
+  font-size: 0.9375rem;
+  color: var(--color-text-muted);
+  text-align: center;
+  line-height: 1.5;
+  max-width: 90%;
+}
+
+/* ===== Speak Button ===== */
+.speak-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.5rem;
+  padding: var(--space-1);
+  opacity: 0.7;
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.speak-btn:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* ===== Rating Container ===== */
+.rating-container {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: center;
+  margin-top: var(--space-4);
+  padding: 0 var(--space-4);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-fast);
+  width: 100%;
+  max-width: 400px;
+}
+
+.rating-container.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.rating-btn--not-yet {
+  border-color: rgba(97, 97, 97, 0.3);
+  flex: 1;
+}
+
+.rating-btn--not-yet:hover {
+  background: var(--color-warning-light);
+  border-color: var(--color-warning);
+}
+
+.rating-btn--remembered {
+  border-color: rgba(66, 66, 66, 0.3);
+  flex: 1;
+}
+
+.rating-btn--remembered:hover {
+  background: var(--color-success-light);
+  border-color: var(--color-success);
+}
+
+/* ===== Study Progress Bar ===== */
+.study-progress-bar {
+  width: 100%;
+  max-width: 400px;
+  height: 4px;
+  background: var(--color-border);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-bottom: var(--space-3);
+}
+
+.study-progress-bar__fill {
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: var(--radius-full);
+  transition: width var(--transition-normal);
+}
+
+/* ===== Swipe Indicators ===== */
+.swipe-indicator {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-lg);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  pointer-events: none;
+  z-index: 10;
+  border: 3px solid currentColor;
+}
+
+.swipe-indicator--right {
+  left: var(--space-4);
+  color: var(--color-success);
+  transform: translateY(-50%) rotate(-15deg);
+}
+
+.swipe-indicator--left {
+  right: var(--space-4);
+  color: var(--color-warning);
+  transform: translateY(-50%) rotate(15deg);
+}
+
+.swipe-indicator.visible {
+  opacity: 1;
+}
+
+/* ===== Progress Ring ===== */
+.progress-ring {
+  width: 160px;
+  height: 160px;
+}
+
+.progress-ring__bg {
+  fill: none;
+  stroke: var(--color-border);
+  stroke-width: 8;
+}
+
+.progress-ring__track--mastered {
+  fill: none;
+  stroke: var(--color-primary);
+  stroke-width: 8;
+  stroke-linecap: round;
+  transform-origin: center;
+  transform: rotate(-90deg);
+  transition: stroke-dashoffset var(--transition-normal);
+}
+
+.progress-ring__track--learning {
+  fill: none;
+  stroke: var(--color-text-subtle);
+  stroke-width: 8;
+  stroke-linecap: round;
+  transform-origin: center;
+  transform: rotate(-90deg);
+  transition: stroke-dashoffset var(--transition-normal);
+}
+
+.progress-ring__text {
+  font-family: var(--font-ui);
+}
+
+.progress-ring__number {
+  font-size: 28px;
+  font-weight: 700;
+  fill: var(--color-text);
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+.progress-ring__label {
+  font-size: 14px;
+  fill: var(--color-text-muted);
+  text-anchor: middle;
+  dominant-baseline: middle;
 }

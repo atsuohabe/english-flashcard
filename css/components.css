@@ -1232,3 +1232,288 @@
 [data-theme="dark"] .heatmap__day--level-4 {
   background: rgba(232, 232, 232, 0.70);
 }
+
+/* ===== Page Containers ===== */
+.page {
+  padding-bottom: var(--space-8);
+  animation: fadeIn 300ms ease;
+}
+
+.page--study {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-4);
+  min-height: calc(100dvh - var(--nav-bottom-height) - 80px);
+}
+
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: var(--space-6);
+}
+
+/* ===== Surface Card ===== */
+.surface-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.surface-card--sm {
+  padding: var(--space-3);
+}
+
+.section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* ===== Dashboard Hero ===== */
+.dashboard-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+  max-width: 400px;
+  padding: var(--space-6) var(--space-4);
+  gap: var(--space-4);
+}
+
+.dashboard-hero__title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.3;
+}
+
+.dashboard-hero__subtitle {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  margin-top: calc(-1 * var(--space-2));
+}
+
+.dashboard-hero__ring {
+  display: flex;
+  justify-content: center;
+}
+
+/* ===== Level Badge ===== */
+.level-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  background: var(--color-primary-light);
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  border: none;
+  font-family: var(--font-ui);
+}
+
+.level-badge:hover {
+  background: var(--color-border);
+  color: var(--color-text);
+}
+
+/* ===== Queue Pills ===== */
+.queue-row {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: center;
+}
+
+.queue-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-3) var(--space-6);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  min-width: 80px;
+}
+
+.queue-pill__number {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.queue-pill__label {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+/* ===== Session Complete ===== */
+.session-complete {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--space-8) var(--space-4);
+  width: 100%;
+  max-width: 400px;
+  gap: var(--space-4);
+}
+
+.session-complete__emoji {
+  font-size: 3rem;
+}
+
+.session-complete__title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.session-complete__stats {
+  display: flex;
+  gap: var(--space-4);
+  margin: var(--space-2) 0;
+}
+
+.session-complete__stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  min-width: 72px;
+}
+
+.session-complete__stat-number {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.session-complete__stat-label {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+/* ===== Browse ===== */
+.category-pills-scroll {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+  padding-bottom: var(--space-2);
+  margin-bottom: var(--space-3);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.category-pills-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.card-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* Browse search input used directly (not as wrapper) */
+input.browse-search {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-ui);
+  font-size: 0.9375rem;
+  transition: border-color var(--transition-fast);
+  margin-bottom: var(--space-3);
+}
+
+input.browse-search:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(26, 26, 26, 0.08);
+}
+
+input.browse-search::placeholder {
+  color: var(--color-text-subtle);
+}
+
+/* Word card in browse grid */
+.word-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  flex: 1;
+}
+
+.word-card__speak-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.125rem;
+  padding: var(--space-1);
+  opacity: 0.6;
+  transition: opacity var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.word-card__speak-btn:hover {
+  opacity: 1;
+}
+
+.word-card__state {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-top: var(--space-1);
+}
+
+.word-card__state--new { background: var(--color-border); }
+.word-card__state--learning { background: #9E9E9E; }
+.word-card__state--young { background: #616161; }
+.word-card__state--mature { background: #1A1A1A; }
+.word-card__state--burned { background: #000; }
+
+/* ===== Settings select fix (used directly on <select> element) ===== */
+select.select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding: var(--space-2) var(--space-6) var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-ui);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%236B7280' d='M0 0l6 8 6-8z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+}
+
+select.select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+/* Settings desc (alias for settings-row__description) */
+.settings-row__desc {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
