@@ -237,7 +237,6 @@ export class Flashcard {
     setTimeout(() => { this._card.style.animation = ''; }, 300);
 
     // 自動音声
-    const settings = Store.getSettings();
     if (settings.autoplayAudio) {
       setTimeout(() => speakWord(wordData.word), 200);
     }
