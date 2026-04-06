@@ -689,4 +689,16 @@ if ('serviceWorker' in navigator && !window.__electronAPI) {
 
 // ─── 起動 ────────────────────────────────────────────────────────────
 
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', () => {
+  init().catch(err => {
+    const container = document.getElementById('view-home');
+    if (container) {
+      container.style.display = 'block';
+      container.innerHTML = `<div style="padding:2rem;color:#fff;font-family:sans-serif">
+        <h2>⚠️ 起動エラー</h2>
+        <pre style="white-space:pre-wrap;font-size:12px;margin-top:1rem">${err?.stack || err}</pre>
+      </div>`;
+    }
+    console.error('init() failed:', err);
+  });
+});
