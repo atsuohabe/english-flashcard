@@ -1,0 +1,45 @@
+{
+  "name": "english-flashcard",
+  "version": "1.0.0",
+  "description": "英単語フラッシュカード",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:mac": "electron-builder --mac",
+    "build:win": "electron-builder --win",
+    "build:linux": "electron-builder --linux"
+  },
+  "build": {
+    "appId": "com.atsuohabe.english-flashcard",
+    "productName": "英単語フラッシュカード",
+    "files": [
+      "**/*",
+      "!tools/**",
+      "!*.xlsx",
+      "!*.md",
+      "!.github/**"
+    ],
+    "mac": {
+      "target": "dmg"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": "AppImage"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "atsuohabe",
+      "repo": "english-flashcard"
+    }
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1"
+  },
+  "dependencies": {
+    "electron-updater": "^6.1.7"
+  }
+}

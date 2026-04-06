@@ -1,0 +1,12 @@
+[
+  { "id": 101, "word": "beautiful", "meaning_ja": "美しい", "part_of_speech": "adjective", "category": "greetings", "example_sentence": "The sunset is beautiful.", "frequency_rank": 101, "difficulty": 2, "level": 2 },
+  { "id": 102, "word": "library", "meaning_ja": "図書館", "part_of_speech": "noun", "category": "school", "example_sentence": "I study at the library.", "frequency_rank": 102, "difficulty": 2, "level": 2 },
+  { "id": 103, "word": "mountain", "meaning_ja": "山", "part_of_speech": "noun", "category": "nature", "example_sentence": "We climbed the mountain.", "frequency_rank": 103, "difficulty": 2, "level": 2 },
+  { "id": 104, "word": "breakfast", "meaning_ja": "朝ごはん", "part_of_speech": "noun", "category": "food", "example_sentence": "I have breakfast at seven.", "frequency_rank": 104, "difficulty": 2, "level": 2 },
+  { "id": 105, "word": "elephant", "meaning_ja": "ゾウ", "part_of_speech": "noun", "category": "animals", "example_sentence": "The elephant has a long nose.", "frequency_rank": 105, "difficulty": 2, "level": 2 },
+  { "id": 106, "word": "umbrella", "meaning_ja": "傘", "part_of_speech": "noun", "category": "clothes", "example_sentence": "Take an umbrella, it will rain.", "frequency_rank": 106, "difficulty": 2, "level": 2 },
+  { "id": 107, "word": "remember", "meaning_ja": "覚えている", "part_of_speech": "verb", "category": "actions", "example_sentence": "I remember your name.", "frequency_rank": 107, "difficulty": 2, "level": 2 },
+  { "id": 108, "word": "homework", "meaning_ja": "宿題", "part_of_speech": "noun", "category": "school", "example_sentence": "I finished my homework.", "frequency_rank": 108, "difficulty": 2, "level": 2 },
+  { "id": 109, "word": "shoulder", "meaning_ja": "肩", "part_of_speech": "noun", "category": "body", "example_sentence": "My shoulder hurts.", "frequency_rank": 109, "difficulty": 2, "level": 2 },
+  { "id": 110, "word": "tomorrow", "meaning_ja": "明日", "part_of_speech": "noun", "category": "daily", "example_sentence": "I will go shopping tomorrow.", "frequency_rank": 110, "difficulty": 2, "level": 2 }
+]

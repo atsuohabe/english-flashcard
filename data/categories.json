@@ -1,0 +1,16 @@
+{
+  "categories": [
+    { "id": "animals", "name_ja": "動物", "icon": "paw", "color": "#FF9800", "description_ja": "動物の名前" },
+    { "id": "food", "name_ja": "食べ物・飲み物", "icon": "bowl", "color": "#FF5722", "description_ja": "食べ物と飲み物" },
+    { "id": "family", "name_ja": "家族・人", "icon": "home", "color": "#E91E63", "description_ja": "家族や人に関する単語" },
+    { "id": "body", "name_ja": "体", "icon": "heart", "color": "#F44336", "description_ja": "体の部分" },
+    { "id": "colors", "name_ja": "色・形", "icon": "palette", "color": "#9C27B0", "description_ja": "色と形の名前" },
+    { "id": "numbers", "name_ja": "数・数え方", "icon": "hash", "color": "#3F51B5", "description_ja": "数字と数え方" },
+    { "id": "school", "name_ja": "学校", "icon": "book", "color": "#009688", "description_ja": "学校に関する単語" },
+    { "id": "nature", "name_ja": "自然・天気", "icon": "sun", "color": "#4CAF50", "description_ja": "自然と天気" },
+    { "id": "clothes", "name_ja": "服・持ち物", "icon": "shirt", "color": "#795548", "description_ja": "服や持ち物" },
+    { "id": "actions", "name_ja": "動作・動詞", "icon": "play", "color": "#8BC34A", "description_ja": "基本的な動詞" },
+    { "id": "daily", "name_ja": "家・生活", "icon": "sofa", "color": "#607D8B", "description_ja": "家の中の物や生活" },
+    { "id": "greetings", "name_ja": "あいさつ・表現", "icon": "chat", "color": "#FFC107", "description_ja": "あいさつや基本表現" }
+  ]
+}
