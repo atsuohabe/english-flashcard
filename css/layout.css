@@ -406,7 +406,7 @@
 
 /* ===== Dark Mode Nav Overrides ===== */
 [data-theme="dark"] .nav-bottom {
-  background: rgba(30, 30, 30, 0.90);
+  background: rgba(15, 23, 42, 0.92);
   border-top-color: var(--color-border);
 }
 
@@ -417,7 +417,7 @@
 
 @media (prefers-color-scheme: dark) {
   .nav-bottom {
-    background: rgba(30, 30, 30, 0.90);
+    background: rgba(15, 23, 42, 0.92);
   }
 }
 

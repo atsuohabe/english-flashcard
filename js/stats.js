@@ -77,7 +77,7 @@ export function renderStats(container) {
   const overview = getOverview();
   const counts = getCardStateCounts();
   const forecast = getForecast(14);
-  const heatmap = getHeatmapData();
+  const heatmap = getHeatmapData(90);
   const retention = getRetentionRate();
 
   container.innerHTML = '';
@@ -134,7 +134,7 @@ export function renderStats(container) {
         stroke-dasharray="${circumference}" stroke-dashoffset="${learningOffset}"/>
       <circle class="progress-ring__track--mastered" cx="80" cy="80" r="65"
         stroke-dasharray="${circumference}" stroke-dashoffset="${masteredOffset}"/>
-      <g class="progress-ring__text" transform="rotate(90 80 80)">
+      <g class="progress-ring__text">
         <text class="progress-ring__number" x="80" y="75">${overview.mastered}</text>
         <text class="progress-ring__label" x="80" y="95">/ ${totalWords} 語</text>
       </g>
@@ -148,11 +148,11 @@ export function renderStats(container) {
   breakdown.style.marginTop = 'var(--space-6)';
 
   const stateLabels = [
-    { state: STATE.NEW, label: '未学習', color: '#D8D8D8' },
-    { state: STATE.LEARNING, label: '学習中', color: '#9E9E9E' },
-    { state: STATE.YOUNG, label: '覚えた（練習中）', color: '#616161' },
-    { state: STATE.MATURE, label: '習得済み', color: '#1A1A1A' },
-    { state: STATE.BURNED, label: '完全定着', color: '#000000' },
+    { state: STATE.NEW, label: '未学習', color: '#CBD5E1' },
+    { state: STATE.LEARNING, label: '学習中', color: '#93C5FD' },
+    { state: STATE.YOUNG, label: '覚えた（練習中）', color: '#60A5FA' },
+    { state: STATE.MATURE, label: '習得済み', color: '#2563EB' },
+    { state: STATE.BURNED, label: '完全定着', color: '#1D4ED8' },
   ];
 
   let breakdownHTML = '<div class="donut-legend">';
@@ -191,8 +191,8 @@ export function renderStats(container) {
   heatmapSection.className = 'surface-card surface-card--sm';
   heatmapSection.style.marginTop = 'var(--space-6)';
 
-  let heatmapHTML = '<div class="section-header"><h3 class="section-title">学習カレンダー</h3></div>';
-  heatmapHTML += '<div class="heatmap" style="display:flex;flex-wrap:wrap;gap:3px;">';
+  let heatmapHTML = '<div class="section-header"><h3 class="section-title">学習カレンダー（90日）</h3></div>';
+  heatmapHTML += '<div class="heatmap-grid">';
   // 先頭の空セルで曜日を揃える
   const firstDate = new Date(heatmap[0]?.date || new Date());
   const startDay = firstDate.getDay();

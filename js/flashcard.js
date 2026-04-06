@@ -187,15 +187,17 @@ export class Flashcard {
     wordEl.textContent = wordData.word;
 
     const len = wordData.word.length;
-    if (len > 12) {
+    wordEl.style.whiteSpace = 'nowrap';
+    if (len > 20) {
+      wordEl.style.fontSize = 'clamp(18px, 5vw, 28px)';
+    } else if (len > 15) {
+      wordEl.style.fontSize = 'clamp(22px, 6vw, 34px)';
+    } else if (len > 12) {
       wordEl.style.fontSize = 'clamp(28px, 7vw, 44px)';
-      wordEl.style.whiteSpace = 'normal';
     } else if (len > 8) {
       wordEl.style.fontSize = 'clamp(36px, 9vw, 56px)';
-      wordEl.style.whiteSpace = 'normal';
     } else {
       wordEl.style.fontSize = '';
-      wordEl.style.whiteSpace = '';
     }
 
     // 品詞バッジ
@@ -214,7 +216,9 @@ export class Flashcard {
 
     // 裏面
     this._card.querySelector('[data-word-back]').textContent = wordData.word;
-    this._card.querySelector('[data-meaning]').textContent = wordData.meaning_ja || '';
+    const settings = Store.getSettings();
+    const meaningText = (settings.showFurigana && wordData.meaning_kana) ? wordData.meaning_kana : (wordData.meaning_ja || '');
+    this._card.querySelector('[data-meaning]').innerHTML = escapeHTML(meaningText).replace(/\n/g, '<br>');
 
     const exEl = this._card.querySelector('[data-example]');
     if (wordData.example_sentence) {

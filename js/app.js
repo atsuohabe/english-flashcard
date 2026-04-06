@@ -97,6 +97,14 @@ function _setupNavigation() {
     });
   });
 
+  // SVG アイコン注入
+  document.querySelectorAll('[data-nav]').forEach(el => {
+    const iconSpan = el.querySelector('.nav-bottom__icon, .nav-sidebar__icon');
+    if (iconSpan && ICONS[el.dataset.nav]) {
+      iconSpan.innerHTML = ICONS[el.dataset.nav];
+    }
+  });
+
   // ハッシュ変更
   window.addEventListener('hashchange', () => {
     const view = window.location.hash.slice(1) || 'home';
@@ -171,7 +179,7 @@ function _renderHome() {
               stroke-dasharray="${circumference}" stroke-dashoffset="${learningOffset}"/>
             <circle class="progress-ring__track--mastered" cx="80" cy="80" r="65"
               stroke-dasharray="${circumference}" stroke-dashoffset="${masteredOffset}"/>
-            <g class="progress-ring__text" transform="rotate(90 80 80)">
+            <g class="progress-ring__text">
               <text class="progress-ring__number" x="80" y="75">${overview.mastered}</text>
               <text class="progress-ring__label" x="80" y="95">/ ${totalWords} 語</text>
             </g>
@@ -358,60 +366,86 @@ function _renderBrowse() {
       <div class="browse-search-wrap">
         <input class="browse-search" type="search" placeholder="英単語・意味で検索..." data-search>
       </div>
-      <div class="category-pills-scroll" data-categories></div>
+      <div class="category-pills-scroll" data-filters></div>
       <div class="text-sm text-muted" style="margin:var(--space-2) 0" data-count>${words.length} 語</div>
       <div class="card-grid" data-word-list></div>
+      <div class="text-center" style="margin-top:var(--space-4)" data-load-more-wrap></div>
     </div>
   `;
 
   const searchInput = container.querySelector('[data-search]');
   const wordList = container.querySelector('[data-word-list]');
   const countEl = container.querySelector('[data-count]');
-  const catContainer = container.querySelector('[data-categories]');
+  const filterContainer = container.querySelector('[data-filters]');
+  const loadMoreWrap = container.querySelector('[data-load-more-wrap]');
 
-  let selectedCategory = null;
+  let selectedFilter = '';
+  let displayLimit = 200;
 
-  // カテゴリピル
-  _renderCategoryPills(catContainer, (catId) => {
-    selectedCategory = catId;
+  // SRS状態フィルタピル
+  _renderSRSFilterPills(filterContainer, (filter) => {
+    selectedFilter = filter;
+    displayLimit = 200;
     filterAndRender();
   });
 
   function filterAndRender() {
     const query = searchInput.value.trim();
     let filtered = query ? Vocab.search(query) : Vocab.getFilteredWords(studyLevel);
-    if (selectedCategory) {
-      filtered = filtered.filter(w => w.category === selectedCategory);
+
+    if (selectedFilter) {
+      filtered = filtered.filter(w => {
+        const srs = Store.getCard(String(w.id));
+        if (selectedFilter === 'new') return !srs;
+        if (selectedFilter === 'learning') return srs && [STATE.LEARNING, STATE.YOUNG, STATE.RELEARN].includes(srs.state);
+        if (selectedFilter === 'mastered') return srs && [STATE.MATURE, STATE.BURNED].includes(srs.state);
+        return true;
+      });
     }
+
     countEl.textContent = `${filtered.length} 語`;
-    _renderWordCards(wordList, filtered.slice(0, 100));
+    _renderWordCards(wordList, filtered.slice(0, displayLimit));
+
+    // 「もっと見る」ボタン
+    if (filtered.length > displayLimit) {
+      loadMoreWrap.innerHTML = `<button class="btn btn--secondary btn--sm" data-action="load-more">もっと見る（残り ${filtered.length - displayLimit} 語）</button>`;
+      loadMoreWrap.querySelector('[data-action="load-more"]').addEventListener('click', () => {
+        displayLimit += 200;
+        filterAndRender();
+      });
+    } else {
+      loadMoreWrap.innerHTML = '';
+    }
   }
 
-  searchInput.addEventListener('input', filterAndRender);
+  searchInput.addEventListener('input', () => {
+    displayLimit = 200;
+    filterAndRender();
+  });
   filterAndRender();
 }
 
-function _renderCategoryPills(container, onSelect) {
-  // カテゴリデータを読み込み
-  fetch('./data/categories.json')
-    .then(r => r.json())
-    .then(data => {
-      const cats = data.categories || [];
-      let html = '<button class="category-pill active" data-cat="">すべて</button>';
-      for (const cat of cats) {
-        html += `<button class="category-pill" data-cat="${escapeHTML(cat.id)}">${escapeHTML(cat.name_ja)}</button>`;
-      }
-      container.innerHTML = html;
+function _renderSRSFilterPills(container, onSelect) {
+  const filters = [
+    { value: '', label: 'すべて' },
+    { value: 'new', label: '未学習' },
+    { value: 'learning', label: '学習中' },
+    { value: 'mastered', label: '習得済み' },
+  ];
 
-      container.addEventListener('click', (e) => {
-        const pill = e.target.closest('[data-cat]');
-        if (!pill) return;
-        container.querySelectorAll('.category-pill').forEach(p => p.classList.remove('active'));
-        pill.classList.add('active');
-        onSelect(pill.dataset.cat || null);
-      });
-    })
-    .catch(() => {});
+  let html = '';
+  for (const f of filters) {
+    html += `<button class="category-pill${f.value === '' ? ' active' : ''}" data-filter="${f.value}">${escapeHTML(f.label)}</button>`;
+  }
+  container.innerHTML = html;
+
+  container.addEventListener('click', (e) => {
+    const pill = e.target.closest('[data-filter]');
+    if (!pill) return;
+    container.querySelectorAll('.category-pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    onSelect(pill.dataset.filter || '');
+  });
 }
 
 function _renderWordCards(container, words) {
@@ -497,7 +531,7 @@ function _renderSettings() {
             <div class="settings-row__desc">1日に復習するカードの上限</div>
           </div>
           <select class="select" data-setting="dailyReviewLimit">
-            ${[50, 100, 150, 200].map(n =>
+            ${[10, 20, 50, 100, 150, 200].map(n =>
               `<option value="${n}" ${settings.dailyReviewLimit === n ? 'selected' : ''}>${n}枚</option>`
             ).join('')}
           </select>
@@ -546,6 +580,37 @@ function _renderSettings() {
               `<option value="${r}" ${settings.ttsRate === r ? 'selected' : ''}>${r}x</option>`
             ).join('')}
           </select>
+        </div>
+
+        <div class="settings-row">
+          <div>
+            <div class="settings-row__label">ふりがな表示</div>
+            <div class="settings-row__desc">意味の漢字にふりがなを付ける</div>
+          </div>
+          <label class="toggle">
+            <input class="toggle__input" type="checkbox" data-setting="showFurigana" ${settings.showFurigana ? 'checked' : ''}>
+            <span class="toggle__slider"></span>
+          </label>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="settings-row">
+          <div>
+            <div class="settings-row__label">アプリを共有する</div>
+            <div class="settings-row__desc">友達にアプリを教える</div>
+          </div>
+          <button class="btn btn--secondary btn--sm" data-action="share">
+            ${ICONS.share} 共有
+          </button>
+        </div>
+
+        <div class="settings-row">
+          <div>
+            <div class="settings-row__label">アプリを更新する</div>
+            <div class="settings-row__desc">最新版に更新</div>
+          </div>
+          <button class="btn btn--secondary btn--sm" data-action="update-app">更新</button>
         </div>
 
         <div class="divider"></div>
@@ -616,6 +681,49 @@ function _renderSettings() {
         });
       }
     });
+  });
+
+  // 共有
+  container.querySelector('[data-action="share"]')?.addEventListener('click', async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: '英単語フラッシュカード',
+          text: '英単語を楽しく覚えよう！',
+          url: window.location.href,
+        });
+      } catch (e) {
+        if (e.name !== 'AbortError') {
+          showToast('共有に失敗しました', { type: 'warning' });
+        }
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        showToast('URLをコピーしました', { type: 'success' });
+      } catch {
+        showToast('コピーに失敗しました', { type: 'warning' });
+      }
+    }
+  });
+
+  // アプリ更新
+  container.querySelector('[data-action="update-app"]')?.addEventListener('click', async () => {
+    try {
+      if ('serviceWorker' in navigator) {
+        const reg = await navigator.serviceWorker.getRegistration();
+        if (reg) {
+          await reg.update();
+          const keys = await caches.keys();
+          await Promise.all(keys.map(k => caches.delete(k)));
+        }
+      }
+      showToast('更新中…ページを再読み込みします', { type: 'info' });
+      setTimeout(() => window.location.reload(), 1000);
+    } catch (e) {
+      console.error('Update failed:', e);
+      window.location.reload();
+    }
   });
 
   // エクスポート

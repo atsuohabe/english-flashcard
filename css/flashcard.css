@@ -97,7 +97,6 @@
   line-height: 1.2;
   text-align: center;
   margin-bottom: var(--space-3);
-  word-break: break-word;
 }
 
 .card__category {
@@ -129,7 +128,6 @@
   line-height: 1.2;
   text-align: center;
   margin-bottom: var(--space-2);
-  word-break: break-word;
 }
 
 .card__meaning {
@@ -142,20 +140,20 @@
 }
 
 .card__example {
-  font-size: 0.9375rem;
-  color: var(--color-text-muted);
-  text-align: center;
+  margin-top: auto;
+  width: 100%;
+  padding: 0 var(--space-2);
+  text-align: left;
+  font-size: 0.8125rem;
   line-height: 1.5;
-  max-width: 90%;
-  margin-bottom: var(--space-2);
+  color: var(--color-text-muted);
 }
 
 .card__example-meaning {
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   color: var(--color-text-subtle);
-  text-align: center;
+  text-align: left;
   line-height: 1.5;
-  max-width: 90%;
 }
 
 .card__pos {
@@ -595,28 +593,38 @@
 }
 
 .card__example-hanzi {
-  font-size: 0.9375rem;
+  font-size: 0.8125rem;
   color: var(--color-text-muted);
-  text-align: center;
+  text-align: left;
   line-height: 1.5;
-  max-width: 90%;
 }
 
 /* ===== Speak Button ===== */
 .speak-btn {
-  background: none;
+  background: var(--color-primary-light);
   border: none;
   cursor: pointer;
-  font-size: 1.5rem;
-  padding: var(--space-1);
-  opacity: 0.7;
-  transition: opacity var(--transition-fast), transform var(--transition-fast);
+  font-size: 2rem;
+  padding: var(--space-3);
+  min-width: 50px;
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  border-radius: var(--radius-full);
+  transition: background var(--transition-fast), transform var(--transition-fast);
   -webkit-tap-highlight-color: transparent;
 }
 
 .speak-btn:hover {
-  opacity: 1;
+  background: var(--color-primary);
+  color: var(--color-surface);
   transform: scale(1.1);
+}
+
+.speak-btn:active {
+  transform: scale(0.95);
 }
 
 /* ===== Rating Container ===== */

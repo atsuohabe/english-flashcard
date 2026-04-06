@@ -52,15 +52,11 @@ def clean_word(text: str) -> str:
     return text
 
 def clean_meaning(text: str) -> str:
-    """意味のクリーニング（※注記は保持）"""
+    """意味のクリーニング（全行保持、※注記も保持）"""
     text = str(text).strip()
-    # 行頭の改行を最初の意味として使用
-    lines = text.split('\n')
-    # 最初の行（主要な意味）を使用
-    main = lines[0].strip() if lines else text
-    main = main.replace('　', ' ').strip()
-    # 数字prefix（例: "①"）は残す
-    return main
+    text = text.replace('　', ' ')
+    lines = [line.strip() for line in text.split('\n') if line.strip()]
+    return '\n'.join(lines)
 
 # ────────────────────────────────────────────────
 # .xls 読み込み (xlrd)
@@ -157,6 +153,7 @@ def read_xls(path: Path) -> list[dict]:
                 "id":               word_id,
                 "word":             word_text,
                 "meaning_ja":       meaning_ja,
+                "meaning_kana":     "",
                 "part_of_speech":   pos,
                 "category":         "general",
                 "example_sentence": example,
@@ -256,6 +253,7 @@ def read_xlsx(path: Path) -> list[dict]:
                 "id":               word_id,
                 "word":             word_text,
                 "meaning_ja":       meaning_ja,
+                "meaning_kana":     "",
                 "part_of_speech":   pos,
                 "category":         "general",
                 "example_sentence": example,
