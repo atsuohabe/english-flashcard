@@ -5,6 +5,7 @@
 
 import { Store } from './store.js';
 import { attachGestures } from './gestures.js';
+import { rubyText } from './ui.js';
 
 // ─── 音声読み上げ ──────────────────────────────────────────────────────
 
@@ -102,7 +103,7 @@ export class Flashcard {
           <span class="card__number" data-number></span>
         </div>
         <div class="card__word-main" data-word></div>
-        <div class="card__hint">タップしてめくる</div>
+        <div class="card__hint">タップしてめくる ▶</div>
       </div>
     `;
 
@@ -129,7 +130,7 @@ export class Flashcard {
     // スワイプインジケーター
     const rightInd = document.createElement('div');
     rightInd.className = 'swipe-indicator swipe-indicator--right';
-    rightInd.textContent = '覚えた ✓';
+    rightInd.innerHTML = `${rubyText('覚えた')} ✓`;
     this._card.appendChild(rightInd);
     this._rightIndicator = rightInd;
 
@@ -144,7 +145,7 @@ export class Flashcard {
     this._ratingContainer.className = 'rating-container';
     this._ratingContainer.innerHTML = `
       <button class="rating-btn rating-btn--not-yet" data-rating="not-yet">まだまだ</button>
-      <button class="rating-btn rating-btn--remembered" data-rating="remembered">覚えた</button>
+      <button class="rating-btn rating-btn--remembered" data-rating="remembered">${rubyText('覚えた')}</button>
     `;
     this._container.appendChild(this._ratingContainer);
 

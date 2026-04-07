@@ -14,7 +14,7 @@ import {
 import { renderStats, updateProgressRing, getOverview } from './stats.js';
 import {
   showToast, showModal, applyTheme, initTheme, checkMilestone,
-  markMilestonesSeen, animateCounter, escapeHTML, ICONS,
+  markMilestonesSeen, animateCounter, escapeHTML, ICONS, rubyText,
 } from './ui.js';
 import { attachKeyboard } from './gestures.js';
 
@@ -169,8 +169,8 @@ function _renderHome() {
     <div class="page page--study">
       <div class="dashboard-hero">
         <span class="level-badge" data-nav="settings">${escapeHTML(levelLabel)}</span>
-        <h1 class="dashboard-hero__title">英単語フラッシュカード</h1>
-        <p class="dashboard-hero__subtitle">間隔反復で英単語をマスターしよう</p>
+        <h1 class="dashboard-hero__title">${rubyText('英単語フラッシュカード')}</h1>
+        <p class="dashboard-hero__subtitle">${rubyText('間隔反復で英単語をマスターしよう')}</p>
 
         <div class="dashboard-hero__ring">
           <svg class="progress-ring" viewBox="0 0 160 160">
@@ -189,16 +189,16 @@ function _renderHome() {
         <div class="queue-row">
           <div class="queue-pill">
             <span class="queue-pill__number">${dueCount}</span>
-            <span class="queue-pill__label">復習</span>
+            <span class="queue-pill__label">${rubyText('復習')}</span>
           </div>
           <div class="queue-pill">
             <span class="queue-pill__number">${newCount}</span>
-            <span class="queue-pill__label">新規</span>
+            <span class="queue-pill__label">${rubyText('新規')}</span>
           </div>
         </div>
 
         <button class="btn btn--primary btn--lg btn--full" data-action="start-study">
-          学習を始める
+          ${rubyText('学習を始める')}
         </button>
       </div>
     </div>
@@ -362,9 +362,9 @@ function _renderBrowse() {
 
   container.innerHTML = `
     <div class="page">
-      <h1 class="page-title">単語一覧</h1>
+      <h1 class="page-title">${rubyText('単語一覧')}</h1>
       <div class="browse-search-wrap">
-        <input class="browse-search" type="search" placeholder="英単語・意味で検索..." data-search>
+        <input class="browse-search" type="search" placeholder="えいたんご・いみで けんさく..." data-search>
       </div>
       <div class="category-pills-scroll" data-filters></div>
       <div class="text-sm text-muted" style="margin:var(--space-2) 0" data-count>${words.length} 語</div>
@@ -428,9 +428,9 @@ function _renderBrowse() {
 function _renderSRSFilterPills(container, onSelect) {
   const filters = [
     { value: '', label: 'すべて' },
-    { value: 'new', label: '未学習' },
-    { value: 'learning', label: '学習中' },
-    { value: 'mastered', label: '習得済み' },
+    { value: 'new', label: rubyText('未学習') },
+    { value: 'learning', label: rubyText('学習中') },
+    { value: 'mastered', label: rubyText('習得済み') },
   ];
 
   let html = '';
@@ -498,13 +498,13 @@ function _renderSettings() {
 
   container.innerHTML = `
     <div class="page">
-      <h1 class="page-title">設定</h1>
+      <h1 class="page-title">${rubyText('設定')}</h1>
 
       <div class="surface-card">
         <div class="settings-row">
           <div>
-            <div class="settings-row__label">学習レベル</div>
-            <div class="settings-row__desc">学習する単語の範囲</div>
+            <div class="settings-row__label">${rubyText('学習')}レベル</div>
+            <div class="settings-row__desc">${rubyText('学習')}する${rubyText('単語')}の${rubyText('範囲')}</div>
           </div>
           <select class="select" data-setting="studyLevel">
             ${LEVEL_OPTIONS.map(o =>
@@ -515,8 +515,8 @@ function _renderSettings() {
 
         <div class="settings-row">
           <div>
-            <div class="settings-row__label">1日の新規カード数</div>
-            <div class="settings-row__desc">1日に導入する新しい単語の上限</div>
+            <div class="settings-row__label">1<ruby>日<rp>(</rp><rt>にち</rt><rp>)</rp></ruby>の${rubyText('新規')}カード<ruby>数<rp>(</rp><rt>すう</rt><rp>)</rp></ruby></div>
+            <div class="settings-row__desc">1<ruby>日<rp>(</rp><rt>にち</rt><rp>)</rp></ruby>に${rubyText('導入')}する<ruby>新<rp>(</rp><rt>あたら</rt><rp>)</rp></ruby>しい${rubyText('単語')}の${rubyText('上限')}</div>
           </div>
           <select class="select" data-setting="dailyNewLimit">
             ${[5, 10, 15, 20, 30].map(n =>
@@ -527,8 +527,8 @@ function _renderSettings() {
 
         <div class="settings-row">
           <div>
-            <div class="settings-row__label">1日の復習上限</div>
-            <div class="settings-row__desc">1日に復習するカードの上限</div>
+            <div class="settings-row__label">1<ruby>日<rp>(</rp><rt>にち</rt><rp>)</rp></ruby>の${rubyText('復習')}${rubyText('上限')}</div>
+            <div class="settings-row__desc">1<ruby>日<rp>(</rp><rt>にち</rt><rp>)</rp></ruby>に${rubyText('復習')}するカードの${rubyText('上限')}</div>
           </div>
           <select class="select" data-setting="dailyReviewLimit">
             ${[10, 20, 50, 100, 150, 200].map(n =>
@@ -539,10 +539,10 @@ function _renderSettings() {
 
         <div class="settings-row">
           <div>
-            <div class="settings-row__label">カード順序</div>
+            <div class="settings-row__label">カード<ruby>順序<rp>(</rp><rt>じゅんじょ</rt><rp>)</rp></ruby></div>
           </div>
           <select class="select" data-setting="cardOrder">
-            <option value="sequential" ${settings.cardOrder === 'sequential' ? 'selected' : ''}>順番通り</option>
+            <option value="sequential" ${settings.cardOrder === 'sequential' ? 'selected' : ''}>${rubyText('順番通')}り</option>
             <option value="random" ${settings.cardOrder === 'random' ? 'selected' : ''}>ランダム</option>
           </select>
         </div>
@@ -562,8 +562,8 @@ function _renderSettings() {
 
         <div class="settings-row">
           <div>
-            <div class="settings-row__label">自動音声</div>
-            <div class="settings-row__desc">カード表示時に英単語を自動読み上げ</div>
+            <div class="settings-row__label">${rubyText('自動音声')}</div>
+            <div class="settings-row__desc">カード${rubyText('表示時')}に${rubyText('英単語')}を<ruby>自動<rp>(</rp><rt>じどう</rt><rp>)</rp></ruby>${rubyText('読')}み${rubyText('上')}げ</div>
           </div>
           <label class="toggle">
             <input class="toggle__input" type="checkbox" data-setting="autoplayAudio" ${settings.autoplayAudio ? 'checked' : ''}>
@@ -573,7 +573,7 @@ function _renderSettings() {
 
         <div class="settings-row">
           <div>
-            <div class="settings-row__label">読み上げ速度</div>
+            <div class="settings-row__label">${rubyText('読')}み${rubyText('上')}げ${rubyText('速度')}</div>
           </div>
           <select class="select" data-setting="ttsRate">
             ${[0.7, 0.8, 0.9, 1.0, 1.1, 1.2].map(r =>
@@ -584,8 +584,8 @@ function _renderSettings() {
 
         <div class="settings-row">
           <div>
-            <div class="settings-row__label">ふりがな表示</div>
-            <div class="settings-row__desc">意味の漢字にふりがなを付ける</div>
+            <div class="settings-row__label">ふりがな<ruby>表示<rp>(</rp><rt>ひょうじ</rt><rp>)</rp></ruby></div>
+            <div class="settings-row__desc">${rubyText('意味')}の<ruby>漢字<rp>(</rp><rt>かんじ</rt><rp>)</rp></ruby>にふりがなを<ruby>付<rp>(</rp><rt>つ</rt><rp>)</rp></ruby>ける</div>
           </div>
           <label class="toggle">
             <input class="toggle__input" type="checkbox" data-setting="showFurigana" ${settings.showFurigana ? 'checked' : ''}>
@@ -597,8 +597,8 @@ function _renderSettings() {
 
         <div class="settings-row">
           <div>
-            <div class="settings-row__label">アプリを共有する</div>
-            <div class="settings-row__desc">友達にアプリを教える</div>
+            <div class="settings-row__label">アプリを${rubyText('共有')}する</div>
+            <div class="settings-row__desc">${rubyText('友達')}にアプリを${rubyText('教')}える</div>
           </div>
           <button class="btn btn--secondary btn--sm" data-action="share">
             ${ICONS.share} 共有
@@ -607,8 +607,8 @@ function _renderSettings() {
 
         <div class="settings-row">
           <div>
-            <div class="settings-row__label">アプリを更新する</div>
-            <div class="settings-row__desc">最新版に更新</div>
+            <div class="settings-row__label">アプリを${rubyText('更新')}する</div>
+            <div class="settings-row__desc">${rubyText('最新版')}に${rubyText('更新')}</div>
           </div>
           <button class="btn btn--secondary btn--sm" data-action="update-app">更新</button>
         </div>
@@ -618,7 +618,7 @@ function _renderSettings() {
         <div class="settings-row">
           <div>
             <div class="settings-row__label">データエクスポート</div>
-            <div class="settings-row__desc">学習進捗をJSONで保存</div>
+            <div class="settings-row__desc">${rubyText('学習')}${rubyText('進捗')}をJSONで${rubyText('保存')}</div>
           </div>
           <button class="btn btn--secondary btn--sm" data-action="export">
             ${ICONS.download} エクスポート
@@ -628,7 +628,7 @@ function _renderSettings() {
         <div class="settings-row">
           <div>
             <div class="settings-row__label">データインポート</div>
-            <div class="settings-row__desc">保存した進捗を復元</div>
+            <div class="settings-row__desc">${rubyText('保存')}した${rubyText('進捗')}を${rubyText('復元')}</div>
           </div>
           <button class="btn btn--secondary btn--sm" data-action="import">
             ${ICONS.upload} インポート
@@ -638,14 +638,14 @@ function _renderSettings() {
         <div class="settings-row">
           <div>
             <div class="settings-row__label">データリセット</div>
-            <div class="settings-row__desc">全ての学習データを削除</div>
+            <div class="settings-row__desc">${rubyText('全')}ての${rubyText('学習')}データを${rubyText('削除')}</div>
           </div>
           <button class="btn btn--secondary btn--sm" style="color:#F44336" data-action="reset">リセット</button>
         </div>
       </div>
 
       <div class="text-center text-xs text-muted" style="margin-top:var(--space-6)">
-        英単語フラッシュカード v${VERSION}
+        ${rubyText('英単語')}フラッシュカード v${VERSION}
         <span data-app-version></span>
       </div>
     </div>
