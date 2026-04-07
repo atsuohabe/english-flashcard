@@ -6,6 +6,22 @@
   padding: 0;
 }
 
+/* ===== ふりがな制御 ===== */
+ruby rt {
+  display: none;
+}
+ruby rp {
+  display: none;
+}
+.furigana-on ruby rt {
+  display: revert;
+  font-size: 0.5em;
+  font-weight: 400;
+}
+.furigana-on ruby rp {
+  display: none;
+}
+
 :root {
   --space-1: 4px;
   --space-2: 8px;

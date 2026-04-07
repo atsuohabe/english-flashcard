@@ -130,7 +130,7 @@ export class Flashcard {
     // スワイプインジケーター
     const rightInd = document.createElement('div');
     rightInd.className = 'swipe-indicator swipe-indicator--right';
-    rightInd.innerHTML = `${rubyText('覚えた')} ✓`;
+    rightInd.textContent = '覚えた ✓';
     this._card.appendChild(rightInd);
     this._rightIndicator = rightInd;
 
@@ -145,7 +145,7 @@ export class Flashcard {
     this._ratingContainer.className = 'rating-container';
     this._ratingContainer.innerHTML = `
       <button class="rating-btn rating-btn--not-yet" data-rating="not-yet">まだまだ</button>
-      <button class="rating-btn rating-btn--remembered" data-rating="remembered">${rubyText('覚えた')}</button>
+      <button class="rating-btn rating-btn--remembered" data-rating="remembered">おぼえた！</button>
     `;
     this._container.appendChild(this._ratingContainer);
 
@@ -218,8 +218,13 @@ export class Flashcard {
     // 裏面
     this._card.querySelector('[data-word-back]').textContent = wordData.word;
     const settings = Store.getSettings();
-    const meaningText = (settings.showFurigana && wordData.meaning_kana) ? wordData.meaning_kana : (wordData.meaning_ja || '');
-    this._card.querySelector('[data-meaning]').innerHTML = escapeHTML(meaningText).replace(/\n/g, '<br>');
+    const meaningRaw = wordData.meaning_ja || '';
+    let meaningHTML = escapeHTML(meaningRaw).replace(/\n/g, '<br>');
+    // ふりがなモード: 意味テキストにもrubyを適用
+    if (settings.showFurigana) {
+      meaningHTML = rubyText(meaningRaw.replace(/\n/g, '<br>'));
+    }
+    this._card.querySelector('[data-meaning]').innerHTML = meaningHTML;
 
     const exEl = this._card.querySelector('[data-example]');
     if (wordData.example_sentence) {
