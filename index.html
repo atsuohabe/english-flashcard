@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="description" content="子供向け英単語フラッシュカードアプリ。間隔反復システム（SRS）で楽しく英語を学ぼう。">
+  <meta name="description" content="English vocabulary flashcard app for kids. Learn words with spaced repetition.">
   <meta name="theme-color" content="#2563EB">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-  <title>英単語フラッシュカード</title>
+  <title>English Flashcards</title>
 
   <link rel="manifest" href="./manifest.json">
   <link rel="icon" type="image/svg+xml" href="./icon.svg">
@@ -31,23 +31,23 @@
   <div id="app" class="app">
 
     <!-- Desktop Sidebar -->
-    <nav class="nav-sidebar" aria-label="メインナビゲーション">
-      <div class="nav-sidebar__logo">英単語<br>フラッシュカード</div>
+    <nav class="nav-sidebar" aria-label="Main navigation">
+      <div class="nav-sidebar__logo">English<br>Flashcards</div>
       <div class="nav-sidebar__items">
         <button class="nav-sidebar__item active" data-nav="home">
-          <span class="nav-sidebar__icon"></span>ホーム
+          <span class="nav-sidebar__icon"></span>Home
         </button>
         <button class="nav-sidebar__item" data-nav="study">
-          <span class="nav-sidebar__icon"></span>学習
+          <span class="nav-sidebar__icon"></span>Study
         </button>
         <button class="nav-sidebar__item" data-nav="browse">
-          <span class="nav-sidebar__icon"></span>一覧
+          <span class="nav-sidebar__icon"></span>Browse
         </button>
         <button class="nav-sidebar__item" data-nav="stats">
-          <span class="nav-sidebar__icon"></span>統計
+          <span class="nav-sidebar__icon"></span>Stats
         </button>
         <button class="nav-sidebar__item" data-nav="settings">
-          <span class="nav-sidebar__icon"></span>設定
+          <span class="nav-sidebar__icon"></span>Settings
         </button>
       </div>
     </nav>
@@ -55,7 +55,7 @@
     <!-- Main Content -->
     <main class="app__main main-content">
       <div id="view-home" class="view active">
-        <div style="padding:2rem;text-align:center;color:var(--color-text-muted)">読み込み中...</div>
+        <div style="padding:2rem;text-align:center;color:var(--color-text-muted)">Loading...</div>
       </div>
       <div id="view-study" class="view"></div>
       <div id="view-browse" class="view"></div>
@@ -64,32 +64,32 @@
     </main>
 
     <!-- Mobile Bottom Nav -->
-    <nav class="nav-bottom" aria-label="メインナビゲーション">
+    <nav class="nav-bottom" aria-label="Main navigation">
       <button class="nav-bottom__item active" data-nav="home">
         <span class="nav-bottom__icon"></span>
-        ホーム
+        Home
       </button>
       <button class="nav-bottom__item" data-nav="study">
         <span class="nav-bottom__icon"></span>
-        学習
+        Study
       </button>
       <button class="nav-bottom__item" data-nav="browse">
         <span class="nav-bottom__icon"></span>
-        一覧
+        Browse
       </button>
       <button class="nav-bottom__item" data-nav="stats">
         <span class="nav-bottom__icon"></span>
-        統計
+        Stats
       </button>
       <button class="nav-bottom__item" data-nav="settings">
         <span class="nav-bottom__icon"></span>
-        設定
+        Settings
       </button>
     </nav>
   </div>
 
   <noscript>
-    <p style="text-align:center;padding:2rem;">このアプリはJavaScriptが必要です。ブラウザの設定でJavaScriptを有効にしてください。</p>
+    <p style="text-align:center;padding:2rem;">This app requires JavaScript. Please enable it in your browser settings.</p>
   </noscript>
 </body>
 </html>

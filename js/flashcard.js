@@ -5,7 +5,6 @@
 
 import { Store } from './store.js';
 import { attachGestures } from './gestures.js';
-import { rubyText } from './ui.js';
 
 // ─── 音声読み上げ ──────────────────────────────────────────────────────
 
@@ -55,8 +54,9 @@ function escapeHTML(str) {
 // ─── 品詞の日本語表示 ──────────────────────────────────────────────────
 
 const POS_LABELS = {
-  noun: '名詞', verb: '動詞', adjective: '形容詞', adverb: '副詞',
-  preposition: '前置詞', conjunction: '接続詞', interjection: '間投詞', pronoun: '代名詞',
+  noun: 'Noun', verb: 'Verb', adjective: 'Adj', adverb: 'Adv',
+  preposition: 'Prep', conjunction: 'Conj', interjection: 'Interj', pronoun: 'Pron',
+  determiner: 'Det', auxiliary: 'Aux', number: 'Num',
 };
 
 function posLabel(pos) {
@@ -108,7 +108,7 @@ export class Flashcard {
           <span class="card__number" data-number></span>
         </div>
         <div class="card__word-main" data-word></div>
-        <div class="card__hint">タップしてめくる ▶</div>
+        <div class="card__hint">Tap to flip ▶</div>
       </div>
     `;
 
@@ -118,7 +118,7 @@ export class Flashcard {
     back.innerHTML = `
       <div class="card__back">
         <div class="card__word-small" data-word-back></div>
-        <button class="speak-btn" data-speak aria-label="発音">🔊</button>
+        <button class="speak-btn" data-speak aria-label="Pronounce">🔊</button>
         <div class="card__meaning" data-meaning></div>
         <div class="card__example" data-example style="display:none">
           <div class="card__example-hanzi" data-example-en></div>
@@ -135,13 +135,13 @@ export class Flashcard {
     // スワイプインジケーター（カード内）
     const rightInd = document.createElement('div');
     rightInd.className = 'swipe-indicator swipe-indicator--right';
-    rightInd.textContent = '覚えた ✓';
+    rightInd.textContent = 'Got it ✓';
     this._card.appendChild(rightInd);
     this._rightIndicator = rightInd;
 
     const leftInd = document.createElement('div');
     leftInd.className = 'swipe-indicator swipe-indicator--left';
-    leftInd.textContent = 'まだまだ ✗';
+    leftInd.textContent = 'Not yet ✗';
     this._card.appendChild(leftInd);
     this._leftIndicator = leftInd;
 
@@ -149,8 +149,8 @@ export class Flashcard {
     this._ratingContainer = document.createElement('div');
     this._ratingContainer.className = 'rating-container';
     this._ratingContainer.innerHTML = `
-      <button class="rating-btn rating-btn--not-yet" data-rating="not-yet">まだまだ</button>
-      <button class="rating-btn rating-btn--remembered" data-rating="remembered"><ruby>覚<rt>おぼ</rt></ruby>えた！</button>
+      <button class="rating-btn rating-btn--not-yet" data-rating="not-yet">Not yet</button>
+      <button class="rating-btn rating-btn--remembered" data-rating="remembered">Got it!</button>
     `;
     layout.appendChild(this._ratingContainer);
 
@@ -223,12 +223,10 @@ export class Flashcard {
     // 裏面
     this._card.querySelector('[data-word-back]').textContent = wordData.word;
     const settings = Store.getSettings();
-    const meaningRaw = wordData.meaning_ja || '';
-    let meaningHTML = escapeHTML(meaningRaw).replace(/\n/g, '<br>');
-    // ふりがなモード: 意味テキストにもrubyを適用
-    if (settings.showFurigana) {
-      meaningHTML = rubyText(meaningRaw.replace(/\n/g, '<br>'));
-    }
+    const meaningSource = (settings.showFurigana && wordData.meaning_kana)
+      ? wordData.meaning_kana
+      : (wordData.meaning_ja || '');
+    const meaningHTML = escapeHTML(meaningSource).replace(/\n/g, '<br>');
     this._card.querySelector('[data-meaning]').innerHTML = meaningHTML;
 
     const exEl = this._card.querySelector('[data-example]');

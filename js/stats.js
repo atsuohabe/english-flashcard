@@ -88,7 +88,7 @@ export function renderStats(container) {
   // タイトル
   const title = document.createElement('h1');
   title.className = 'page-title';
-  title.innerHTML = '<ruby>統計<rt>とうけい</rt></ruby>';
+  title.textContent = 'Stats';
   page.appendChild(title);
 
   // 概要グリッド
@@ -97,19 +97,19 @@ export function renderStats(container) {
   grid.innerHTML = `
     <div class="stat-tile">
       <div class="stat-tile__value" data-stat="reviewed">${overview.totalReviewed.toLocaleString()}</div>
-      <div class="stat-tile__label"><ruby>復習<rt>ふくしゅう</rt></ruby><ruby>回数<rt>かいすう</rt></ruby></div>
+      <div class="stat-tile__label">Reviews</div>
     </div>
     <div class="stat-tile">
       <div class="stat-tile__value" data-stat="mastered">${overview.mastered}</div>
-      <div class="stat-tile__label"><ruby>習得済<rt>しゅうとくず</rt></ruby>み</div>
+      <div class="stat-tile__label">Mastered</div>
     </div>
     <div class="stat-tile">
       <div class="stat-tile__value" data-stat="streak">${overview.streak}</div>
-      <div class="stat-tile__label"><ruby>連続<rt>れんぞく</rt></ruby><ruby>日数<rt>にっすう</rt></ruby></div>
+      <div class="stat-tile__label">Day Streak</div>
     </div>
     <div class="stat-tile">
       <div class="stat-tile__value" data-stat="time">${overview.totalMinutes}</div>
-      <div class="stat-tile__label"><ruby>学習<rt>がくしゅう</rt></ruby><ruby>時間<rt>じかん</rt></ruby>(<ruby>分<rt>ふん</rt></ruby>)</div>
+      <div class="stat-tile__label">Minutes</div>
     </div>
   `;
   page.appendChild(grid);
@@ -120,11 +120,11 @@ export function renderStats(container) {
   breakdown.style.marginTop = 'var(--space-6)';
 
   const stateLabels = [
-    { state: STATE.NEW, label: '<ruby>未学習<rt>みがくしゅう</rt></ruby>', color: '#CBD5E1' },
-    { state: STATE.LEARNING, label: '<ruby>学習中<rt>がくしゅうちゅう</rt></ruby>', color: '#93C5FD' },
-    { state: STATE.YOUNG, label: '<ruby>覚<rt>おぼ</rt></ruby>えた（<ruby>練習中<rt>れんしゅうちゅう</rt></ruby>）', color: '#60A5FA' },
-    { state: STATE.MATURE, label: '<ruby>習得済<rt>しゅうとくず</rt></ruby>み', color: '#2563EB' },
-    { state: STATE.BURNED, label: '<ruby>完全定着<rt>かんぜんていちゃく</rt></ruby>', color: '#1D4ED8' },
+    { state: STATE.NEW, label: 'New', color: '#CBD5E1' },
+    { state: STATE.LEARNING, label: 'Learning', color: '#93C5FD' },
+    { state: STATE.YOUNG, label: 'Remembered (practicing)', color: '#60A5FA' },
+    { state: STATE.MATURE, label: 'Mastered', color: '#2563EB' },
+    { state: STATE.BURNED, label: 'Fully retained', color: '#1D4ED8' },
   ];
 
   let breakdownHTML = '<div class="donut-legend">';
@@ -147,12 +147,12 @@ export function renderStats(container) {
   forecastSection.style.marginTop = 'var(--space-6)';
 
   const maxForecast = Math.max(1, ...forecast.map(f => f.count));
-  let forecastHTML = '<div class="section-header"><h3 class="section-title"><ruby>今後<rt>こんご</rt></ruby>14<ruby>日<rt>にち</rt></ruby>の<ruby>復習予測<rt>ふくしゅうよそく</rt></ruby></h3></div>';
+  let forecastHTML = '<div class="section-header"><h3 class="section-title">Review forecast (14 days)</h3></div>';
   forecastHTML += '<div class="forecast-chart__bars">';
   for (let i = 0; i < forecast.length; i++) {
     const pct = Math.round((forecast[i].count / maxForecast) * 100);
     const isToday = i === 0;
-    forecastHTML += `<div class="forecast-chart__bar${isToday ? ' forecast-chart__bar--today' : ''}" style="height:${Math.max(2, pct)}%"><span class="forecast-chart__bar-tooltip">${forecast[i].count}枚</span></div>`;
+    forecastHTML += `<div class="forecast-chart__bar${isToday ? ' forecast-chart__bar--today' : ''}" style="height:${Math.max(2, pct)}%"><span class="forecast-chart__bar-tooltip">${forecast[i].count}</span></div>`;
   }
   forecastHTML += '</div>';
   forecastSection.innerHTML = forecastHTML;
@@ -163,7 +163,7 @@ export function renderStats(container) {
   heatmapSection.className = 'surface-card surface-card--sm';
   heatmapSection.style.marginTop = 'var(--space-6)';
 
-  let heatmapHTML = '<div class="section-header"><h3 class="section-title"><ruby>学習<rt>がくしゅう</rt></ruby>カレンダー（90<ruby>日<rt>にち</rt></ruby>）</h3></div>';
+  let heatmapHTML = '<div class="section-header"><h3 class="section-title">Activity (90 days)</h3></div>';
   heatmapHTML += '<div class="heatmap-grid">';
   // 先頭の空セルで曜日を揃える
   const firstDate = new Date(heatmap[0]?.date || new Date());
@@ -172,7 +172,7 @@ export function renderStats(container) {
     heatmapHTML += '<div class="heatmap__day" style="opacity:0"></div>';
   }
   for (const day of heatmap) {
-    heatmapHTML += `<div class="heatmap__day heatmap__day--level-${day.level}" title="${new Date(day.date).toLocaleDateString('ja-JP')}: ${day.count}回"></div>`;
+    heatmapHTML += `<div class="heatmap__day heatmap__day--level-${day.level}" title="${new Date(day.date).toLocaleDateString('en-US')}: ${day.count}"></div>`;
   }
   heatmapHTML += '</div>';
   heatmapSection.innerHTML = heatmapHTML;

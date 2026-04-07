@@ -8,6 +8,8 @@
   margin: 0 auto;
   aspect-ratio: 3 / 4;
   max-height: 400px;
+  position: relative;
+  z-index: 1;
 }
 
 @media (max-height: 700px) {
@@ -661,22 +663,20 @@
 
 /* ===== Rating Container ===== */
 .rating-container {
-  display: flex;
+  display: none;
   gap: var(--space-3);
   justify-content: center;
   margin-top: var(--space-3);
   padding: var(--space-2) var(--space-4) var(--space-4);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity var(--transition-fast);
   width: 100%;
   max-width: 400px;
   flex-shrink: 0;
+  position: relative;
+  z-index: 10;
 }
 
 .rating-container.visible {
-  opacity: 1;
-  pointer-events: auto;
+  display: flex;
 }
 
 .rating-btn--not-yet {
