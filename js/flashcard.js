@@ -80,11 +80,16 @@ export class Flashcard {
   _build() {
     this._container.innerHTML = '';
 
+    // 全体レイアウトラッパー（評価ボタンをカードの3Dコンテキスト外に分離）
+    const layout = document.createElement('div');
+    layout.className = 'study-layout';
+    this._container.appendChild(layout);
+
     // プログレスバー
     this._progressBar = document.createElement('div');
     this._progressBar.className = 'study-progress-bar';
     this._progressBar.innerHTML = '<div class="study-progress-bar__fill" style="width:0%"></div>';
-    this._container.appendChild(this._progressBar);
+    layout.appendChild(this._progressBar);
 
     // カードシーン
     const scene = document.createElement('div');
@@ -125,9 +130,9 @@ export class Flashcard {
     this._card.appendChild(front);
     this._card.appendChild(back);
     scene.appendChild(this._card);
-    this._container.appendChild(scene);
+    layout.appendChild(scene);
 
-    // スワイプインジケーター
+    // スワイプインジケーター（カード内）
     const rightInd = document.createElement('div');
     rightInd.className = 'swipe-indicator swipe-indicator--right';
     rightInd.textContent = '覚えた ✓';
@@ -140,14 +145,14 @@ export class Flashcard {
     this._card.appendChild(leftInd);
     this._leftIndicator = leftInd;
 
-    // 評価ボタン
+    // 評価ボタン（layoutに直接追加 — カードの3D空間外）
     this._ratingContainer = document.createElement('div');
     this._ratingContainer.className = 'rating-container';
     this._ratingContainer.innerHTML = `
       <button class="rating-btn rating-btn--not-yet" data-rating="not-yet">まだまだ</button>
-      <button class="rating-btn rating-btn--remembered" data-rating="remembered">おぼえた！</button>
+      <button class="rating-btn rating-btn--remembered" data-rating="remembered"><ruby>覚<rt>おぼ</rt></ruby>えた！</button>
     `;
-    this._container.appendChild(this._ratingContainer);
+    layout.appendChild(this._ratingContainer);
 
     this._setupEvents();
   }

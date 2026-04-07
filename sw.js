@@ -3,7 +3,7 @@
  * オフライン対応のためのキャッシュ戦略
  */
 
-const CACHE_NAME = 'efc-v5';
+const CACHE_NAME = 'efc-v6';
 
 // ベースパスを動的に検出
 const BASE = new URL('./', self.location.href).pathname;

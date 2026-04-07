@@ -88,7 +88,7 @@ export function renderStats(container) {
   // タイトル
   const title = document.createElement('h1');
   title.className = 'page-title';
-  title.textContent = 'とうけい';
+  title.innerHTML = '<ruby>統計<rt>とうけい</rt></ruby>';
   page.appendChild(title);
 
   // 概要グリッド
@@ -97,19 +97,19 @@ export function renderStats(container) {
   grid.innerHTML = `
     <div class="stat-tile">
       <div class="stat-tile__value" data-stat="reviewed">${overview.totalReviewed.toLocaleString()}</div>
-      <div class="stat-tile__label">ふくしゅう かいすう</div>
+      <div class="stat-tile__label"><ruby>復習<rt>ふくしゅう</rt></ruby><ruby>回数<rt>かいすう</rt></ruby></div>
     </div>
     <div class="stat-tile">
       <div class="stat-tile__value" data-stat="mastered">${overview.mastered}</div>
-      <div class="stat-tile__label">しゅうとくずみ</div>
+      <div class="stat-tile__label"><ruby>習得済<rt>しゅうとくず</rt></ruby>み</div>
     </div>
     <div class="stat-tile">
       <div class="stat-tile__value" data-stat="streak">${overview.streak}</div>
-      <div class="stat-tile__label">れんぞく にっすう</div>
+      <div class="stat-tile__label"><ruby>連続<rt>れんぞく</rt></ruby><ruby>日数<rt>にっすう</rt></ruby></div>
     </div>
     <div class="stat-tile">
       <div class="stat-tile__value" data-stat="time">${overview.totalMinutes}</div>
-      <div class="stat-tile__label">がくしゅう じかん(ふん)</div>
+      <div class="stat-tile__label"><ruby>学習<rt>がくしゅう</rt></ruby><ruby>時間<rt>じかん</rt></ruby>(<ruby>分<rt>ふん</rt></ruby>)</div>
     </div>
   `;
   page.appendChild(grid);
@@ -120,11 +120,11 @@ export function renderStats(container) {
   breakdown.style.marginTop = 'var(--space-6)';
 
   const stateLabels = [
-    { state: STATE.NEW, label: 'みがくしゅう', color: '#CBD5E1' },
-    { state: STATE.LEARNING, label: 'がくしゅうちゅう', color: '#93C5FD' },
-    { state: STATE.YOUNG, label: 'おぼえた（れんしゅうちゅう）', color: '#60A5FA' },
-    { state: STATE.MATURE, label: 'しゅうとくずみ', color: '#2563EB' },
-    { state: STATE.BURNED, label: 'かんぜん ていちゃく', color: '#1D4ED8' },
+    { state: STATE.NEW, label: '<ruby>未学習<rt>みがくしゅう</rt></ruby>', color: '#CBD5E1' },
+    { state: STATE.LEARNING, label: '<ruby>学習中<rt>がくしゅうちゅう</rt></ruby>', color: '#93C5FD' },
+    { state: STATE.YOUNG, label: '<ruby>覚<rt>おぼ</rt></ruby>えた（<ruby>練習中<rt>れんしゅうちゅう</rt></ruby>）', color: '#60A5FA' },
+    { state: STATE.MATURE, label: '<ruby>習得済<rt>しゅうとくず</rt></ruby>み', color: '#2563EB' },
+    { state: STATE.BURNED, label: '<ruby>完全定着<rt>かんぜんていちゃく</rt></ruby>', color: '#1D4ED8' },
   ];
 
   let breakdownHTML = '<div class="donut-legend">';
@@ -147,7 +147,7 @@ export function renderStats(container) {
   forecastSection.style.marginTop = 'var(--space-6)';
 
   const maxForecast = Math.max(1, ...forecast.map(f => f.count));
-  let forecastHTML = '<div class="section-header"><h3 class="section-title">こんご14にちの ふくしゅうよそく</h3></div>';
+  let forecastHTML = '<div class="section-header"><h3 class="section-title"><ruby>今後<rt>こんご</rt></ruby>14<ruby>日<rt>にち</rt></ruby>の<ruby>復習予測<rt>ふくしゅうよそく</rt></ruby></h3></div>';
   forecastHTML += '<div class="forecast-chart__bars">';
   for (let i = 0; i < forecast.length; i++) {
     const pct = Math.round((forecast[i].count / maxForecast) * 100);
@@ -163,7 +163,7 @@ export function renderStats(container) {
   heatmapSection.className = 'surface-card surface-card--sm';
   heatmapSection.style.marginTop = 'var(--space-6)';
 
-  let heatmapHTML = '<div class="section-header"><h3 class="section-title">がくしゅうカレンダー（90にち）</h3></div>';
+  let heatmapHTML = '<div class="section-header"><h3 class="section-title"><ruby>学習<rt>がくしゅう</rt></ruby>カレンダー（90<ruby>日<rt>にち</rt></ruby>）</h3></div>';
   heatmapHTML += '<div class="heatmap-grid">';
   // 先頭の空セルで曜日を揃える
   const firstDate = new Date(heatmap[0]?.date || new Date());

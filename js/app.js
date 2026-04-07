@@ -179,8 +179,8 @@ function _renderHome() {
     <div class="page page--study">
       <div class="dashboard-hero">
         <span class="level-badge" data-nav="settings">${escapeHTML(levelLabel)}</span>
-        <h1 class="dashboard-hero__title">えいたんごフラッシュカード</h1>
-        <p class="dashboard-hero__subtitle">まいにちくりかえして、えいたんごをマスターしよう</p>
+        <h1 class="dashboard-hero__title"><ruby>英単語<rt>えいたんご</rt></ruby>フラッシュカード</h1>
+        <p class="dashboard-hero__subtitle"><ruby>毎日<rt>まいにち</rt></ruby>くり<ruby>返<rt>かえ</rt></ruby>して、<ruby>英単語<rt>えいたんご</rt></ruby>をマスターしよう</p>
 
         <div class="dashboard-hero__ring">
           <svg class="progress-ring" viewBox="0 0 160 160">
@@ -199,16 +199,16 @@ function _renderHome() {
         <div class="queue-row">
           <div class="queue-pill">
             <span class="queue-pill__number">${dueCount}</span>
-            <span class="queue-pill__label">ふくしゅう</span>
+            <span class="queue-pill__label"><ruby>復習<rt>ふくしゅう</rt></ruby></span>
           </div>
           <div class="queue-pill">
             <span class="queue-pill__number">${newCount}</span>
-            <span class="queue-pill__label">しんき</span>
+            <span class="queue-pill__label"><ruby>新規<rt>しんき</rt></ruby></span>
           </div>
         </div>
 
         <button class="btn btn--primary btn--lg btn--full" data-action="start-study">
-          がくしゅうを はじめる
+          <ruby>学習<rt>がくしゅう</rt></ruby>を<ruby>始<rt>はじ</rt></ruby>める
         </button>
       </div>
     </div>
@@ -372,7 +372,7 @@ function _renderBrowse() {
 
   container.innerHTML = `
     <div class="page">
-      <h1 class="page-title">たんご いちらん</h1>
+      <h1 class="page-title"><ruby>単語<rt>たんご</rt></ruby><ruby>一覧<rt>いちらん</rt></ruby></h1>
       <div class="browse-search-wrap">
         <input class="browse-search" type="search" placeholder="えいたんご・いみで けんさく..." data-search>
       </div>
@@ -438,9 +438,9 @@ function _renderBrowse() {
 function _renderSRSFilterPills(container, onSelect) {
   const filters = [
     { value: '', label: 'すべて' },
-    { value: 'new', label: 'みがくしゅう' },
-    { value: 'learning', label: 'がくしゅうちゅう' },
-    { value: 'mastered', label: 'しゅうとくずみ' },
+    { value: 'new', label: '<ruby>未学習<rt>みがくしゅう</rt></ruby>' },
+    { value: 'learning', label: '<ruby>学習中<rt>がくしゅうちゅう</rt></ruby>' },
+    { value: 'mastered', label: '<ruby>習得済<rt>しゅうとくず</rt></ruby>み' },
   ];
 
   let html = '';
@@ -506,13 +506,13 @@ function _renderSettings() {
 
   container.innerHTML = `
     <div class="page">
-      <h1 class="page-title">せってい</h1>
+      <h1 class="page-title"><ruby>設定<rt>せってい</rt></ruby></h1>
 
       <div class="surface-card">
         <div class="settings-row">
           <div>
-            <div class="settings-row__label">がくしゅうレベル</div>
-            <div class="settings-row__desc">がくしゅうする たんごの はんい</div>
+            <div class="settings-row__label"><ruby>学習<rt>がくしゅう</rt></ruby>レベル</div>
+            <div class="settings-row__desc"><ruby>学習<rt>がくしゅう</rt></ruby>する<ruby>単語<rt>たんご</rt></ruby>の<ruby>範囲<rt>はんい</rt></ruby></div>
           </div>
           <select class="select" data-setting="studyLevel">
             ${LEVEL_OPTIONS.map(o =>
@@ -523,34 +523,34 @@ function _renderSettings() {
 
         <div class="settings-row">
           <div>
-            <div class="settings-row__label">1にちの しんきカードすう</div>
-            <div class="settings-row__desc">1にちに はじめる あたらしい たんごの じょうげん</div>
+            <div class="settings-row__label">1<ruby>日<rt>にち</rt></ruby>の<ruby>新規<rt>しんき</rt></ruby>カード<ruby>数<rt>すう</rt></ruby></div>
+            <div class="settings-row__desc">1<ruby>日<rt>にち</rt></ruby>に<ruby>導入<rt>どうにゅう</rt></ruby>する<ruby>新<rt>あたら</rt></ruby>しい<ruby>単語<rt>たんご</rt></ruby>の<ruby>上限<rt>じょうげん</rt></ruby></div>
           </div>
           <select class="select" data-setting="dailyNewLimit">
             ${[5, 10, 15, 20, 30].map(n =>
-              `<option value="${n}" ${settings.dailyNewLimit === n ? 'selected' : ''}>${n}まい</option>`
+              `<option value="${n}" ${settings.dailyNewLimit === n ? 'selected' : ''}>${n}枚</option>`
             ).join('')}
           </select>
         </div>
 
         <div class="settings-row">
           <div>
-            <div class="settings-row__label">1にちの ふくしゅう じょうげん</div>
-            <div class="settings-row__desc">1にちに ふくしゅうする カードの じょうげん</div>
+            <div class="settings-row__label">1<ruby>日<rt>にち</rt></ruby>の<ruby>復習<rt>ふくしゅう</rt></ruby><ruby>上限<rt>じょうげん</rt></ruby></div>
+            <div class="settings-row__desc">1<ruby>日<rt>にち</rt></ruby>に<ruby>復習<rt>ふくしゅう</rt></ruby>するカードの<ruby>上限<rt>じょうげん</rt></ruby></div>
           </div>
           <select class="select" data-setting="dailyReviewLimit">
             ${[10, 20, 50, 100, 150, 200].map(n =>
-              `<option value="${n}" ${settings.dailyReviewLimit === n ? 'selected' : ''}>${n}まい</option>`
+              `<option value="${n}" ${settings.dailyReviewLimit === n ? 'selected' : ''}>${n}枚</option>`
             ).join('')}
           </select>
         </div>
 
         <div class="settings-row">
           <div>
-            <div class="settings-row__label">カードじゅんじょ</div>
+            <div class="settings-row__label">カード<ruby>順序<rt>じゅんじょ</rt></ruby></div>
           </div>
           <select class="select" data-setting="cardOrder">
-            <option value="sequential" ${settings.cardOrder === 'sequential' ? 'selected' : ''}>じゅんばんどおり</option>
+            <option value="sequential" ${settings.cardOrder === 'sequential' ? 'selected' : ''}><ruby>順番通<rt>じゅんばんどお</rt></ruby>り</option>
             <option value="random" ${settings.cardOrder === 'random' ? 'selected' : ''}>ランダム</option>
           </select>
         </div>
@@ -562,7 +562,7 @@ function _renderSettings() {
             <div class="settings-row__label">テーマ</div>
           </div>
           <select class="select" data-setting="theme">
-            <option value="auto" ${settings.theme === 'auto' ? 'selected' : ''}>じどう</option>
+            <option value="auto" ${settings.theme === 'auto' ? 'selected' : ''}><ruby>自動<rt>じどう</rt></ruby></option>
             <option value="light" ${settings.theme === 'light' ? 'selected' : ''}>ライト</option>
             <option value="dark" ${settings.theme === 'dark' ? 'selected' : ''}>ダーク</option>
           </select>
@@ -570,8 +570,8 @@ function _renderSettings() {
 
         <div class="settings-row">
           <div>
-            <div class="settings-row__label">じどうおんせい</div>
-            <div class="settings-row__desc">カードが でたら えいたんごを よみあげ</div>
+            <div class="settings-row__label"><ruby>自動<rt>じどう</rt></ruby><ruby>音声<rt>おんせい</rt></ruby></div>
+            <div class="settings-row__desc">カード<ruby>表示時<rt>ひょうじじ</rt></ruby>に<ruby>英単語<rt>えいたんご</rt></ruby>を<ruby>自動読<rt>じどうよ</rt></ruby>み<ruby>上<rt>あ</rt></ruby>げ</div>
           </div>
           <label class="toggle">
             <input class="toggle__input" type="checkbox" data-setting="autoplayAudio" ${settings.autoplayAudio ? 'checked' : ''}>
@@ -581,7 +581,7 @@ function _renderSettings() {
 
         <div class="settings-row">
           <div>
-            <div class="settings-row__label">よみあげ そくど</div>
+            <div class="settings-row__label"><ruby>読<rt>よ</rt></ruby>み<ruby>上<rt>あ</rt></ruby>げ<ruby>速度<rt>そくど</rt></ruby></div>
           </div>
           <select class="select" data-setting="ttsRate">
             ${[0.7, 0.8, 0.9, 1.0, 1.1, 1.2].map(r =>
@@ -593,7 +593,7 @@ function _renderSettings() {
         <div class="settings-row">
           <div>
             <div class="settings-row__label">ふりがなモード</div>
-            <div class="settings-row__desc">いみの かんじに ふりがなを つける</div>
+            <div class="settings-row__desc"><ruby>意味<rt>いみ</rt></ruby>の<ruby>漢字<rt>かんじ</rt></ruby>にふりがなを<ruby>付<rt>つ</rt></ruby>ける</div>
           </div>
           <label class="toggle">
             <input class="toggle__input" type="checkbox" data-setting="showFurigana" ${settings.showFurigana ? 'checked' : ''}>
@@ -605,20 +605,20 @@ function _renderSettings() {
 
         <div class="settings-row">
           <div>
-            <div class="settings-row__label">アプリをきょうゆう</div>
-            <div class="settings-row__desc">ともだちに アプリを おしえる</div>
+            <div class="settings-row__label">アプリを<ruby>共有<rt>きょうゆう</rt></ruby></div>
+            <div class="settings-row__desc"><ruby>友達<rt>ともだち</rt></ruby>にアプリを<ruby>教<rt>おし</rt></ruby>える</div>
           </div>
           <button class="btn btn--secondary btn--sm" data-action="share">
-            ${ICONS.share} きょうゆう
+            ${ICONS.share} <ruby>共有<rt>きょうゆう</rt></ruby>
           </button>
         </div>
 
         <div class="settings-row">
           <div>
-            <div class="settings-row__label">アプリをこうしん</div>
-            <div class="settings-row__desc">さいしんばんに こうしん</div>
+            <div class="settings-row__label">アプリを<ruby>更新<rt>こうしん</rt></ruby></div>
+            <div class="settings-row__desc"><ruby>最新版<rt>さいしんばん</rt></ruby>に<ruby>更新<rt>こうしん</rt></ruby></div>
           </div>
-          <button class="btn btn--secondary btn--sm" data-action="update-app">こうしん</button>
+          <button class="btn btn--secondary btn--sm" data-action="update-app"><ruby>更新<rt>こうしん</rt></ruby></button>
         </div>
 
         <div class="divider"></div>
@@ -626,7 +626,7 @@ function _renderSettings() {
         <div class="settings-row">
           <div>
             <div class="settings-row__label">データエクスポート</div>
-            <div class="settings-row__desc">がくしゅう データを ほぞん</div>
+            <div class="settings-row__desc"><ruby>学習<rt>がくしゅう</rt></ruby><ruby>進捗<rt>しんちょく</rt></ruby>をJSONで<ruby>保存<rt>ほぞん</rt></ruby></div>
           </div>
           <button class="btn btn--secondary btn--sm" data-action="export">
             ${ICONS.download} エクスポート
@@ -636,7 +636,7 @@ function _renderSettings() {
         <div class="settings-row">
           <div>
             <div class="settings-row__label">データインポート</div>
-            <div class="settings-row__desc">ほぞんした データを ふくげん</div>
+            <div class="settings-row__desc"><ruby>保存<rt>ほぞん</rt></ruby>した<ruby>進捗<rt>しんちょく</rt></ruby>を<ruby>復元<rt>ふくげん</rt></ruby></div>
           </div>
           <button class="btn btn--secondary btn--sm" data-action="import">
             ${ICONS.upload} インポート
@@ -646,14 +646,14 @@ function _renderSettings() {
         <div class="settings-row">
           <div>
             <div class="settings-row__label">データリセット</div>
-            <div class="settings-row__desc">すべての がくしゅうデータを さくじょ</div>
+            <div class="settings-row__desc"><ruby>全<rt>すべ</rt></ruby>ての<ruby>学習<rt>がくしゅう</rt></ruby>データを<ruby>削除<rt>さくじょ</rt></ruby></div>
           </div>
           <button class="btn btn--secondary btn--sm" style="color:#F44336" data-action="reset">リセット</button>
         </div>
       </div>
 
       <div class="text-center text-xs text-muted" style="margin-top:var(--space-6)">
-        えいたんごフラッシュカード v${VERSION}
+        <ruby>英単語<rt>えいたんご</rt></ruby>フラッシュカード v${VERSION}
         <span data-app-version></span>
       </div>
     </div>

@@ -476,6 +476,20 @@
   max-width: 280px;
 }
 
+/* ===== Study Layout Wrapper ===== */
+.study-layout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: var(--space-3) var(--space-4) calc(var(--space-6) + env(safe-area-inset-bottom, 0px));
+  gap: var(--space-3);
+  min-height: 100%;
+  box-sizing: border-box;
+  /* カードの3D変換がボタンに影響しないよう isolation を指定 */
+  isolation: isolate;
+}
+
 /* ===== Study Container ===== */
 .study-container {
   display: flex;
