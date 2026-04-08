@@ -54,9 +54,7 @@ const MILESTONES = [
 let _shownMilestones = new Set();
 
 export function initMilestones() {
-  // 起動時に既に達成済みのマイルストーンを記録（再通知防止）
-  const { getMasteredCount } = require('./srs.js') || {};
-  // app.js 側で初期化時に呼ぶ
+  // Handled in app.js via markMilestonesSeen()
 }
 
 export function checkMilestone(masteredCount) {
