@@ -42,28 +42,26 @@ export function showToast(message, { type = 'info', duration = 3000, icon = '' }
 // ─── マイルストーン ────────────────────────────────────────────────────
 
 const MILESTONES = [
-  { count: 10,  badge: '🌱', label: '芽吹き',   message: '最初の10語をマスター！' },
-  { count: 25,  badge: '🌿', label: '若葉',     message: '25語達成！順調です！' },
-  { count: 50,  badge: '🌳', label: '成長',     message: '50語マスター！すごい！' },
-  { count: 100, badge: '⭐', label: '星',       message: '100語突破！よく頑張りました！' },
-  { count: 200, badge: '🌟', label: '輝き',     message: '200語達成！英語の力がついてきた！' },
-  { count: 300, badge: '💫', label: '流星',     message: '300語マスター！素晴らしい！' },
-  { count: 500, badge: '👑', label: 'マスター', message: '500語達成！英語マスターへの道！' },
+  { count: 10,  badge: '🌱', label: 'Sprout',  message: 'First 10 words mastered!' },
+  { count: 25,  badge: '🌿', label: 'Sapling', message: '25 words done! Keep it up!' },
+  { count: 50,  badge: '🌳', label: 'Growing', message: '50 words mastered! Amazing!' },
+  { count: 100, badge: '⭐', label: 'Star',    message: '100 words! Great job!' },
+  { count: 200, badge: '🌟', label: 'Shining', message: '200 words! Your English is growing!' },
+  { count: 300, badge: '💫', label: 'Meteor',  message: '300 words mastered! Wonderful!' },
+  { count: 500, badge: '👑', label: 'Master',  message: '500 words! On the road to mastery!' },
 ];
 
 let _shownMilestones = new Set();
 
 export function initMilestones() {
-  // 起動時に既に達成済みのマイルストーンを記録（再通知防止）
-  const { getMasteredCount } = require('./srs.js') || {};
-  // app.js 側で初期化時に呼ぶ
+  // Handled in app.js via markMilestonesSeen()
 }
 
 export function checkMilestone(masteredCount) {
   for (const ms of MILESTONES) {
     if (masteredCount >= ms.count && !_shownMilestones.has(ms.count)) {
       _shownMilestones.add(ms.count);
-      showToast(`${ms.badge} ${ms.label}：${ms.message}`, {
+      showToast(`${ms.badge} ${ms.label}: ${ms.message}`, {
         type: 'milestone',
         duration: 5000,
         icon: ms.badge,

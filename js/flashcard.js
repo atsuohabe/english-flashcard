@@ -54,8 +54,9 @@ function escapeHTML(str) {
 // ─── 品詞の日本語表示 ──────────────────────────────────────────────────
 
 const POS_LABELS = {
-  noun: '名詞', verb: '動詞', adjective: '形容詞', adverb: '副詞',
-  preposition: '前置詞', conjunction: '接続詞', interjection: '間投詞', pronoun: '代名詞',
+  noun: 'Noun', verb: 'Verb', adjective: 'Adj', adverb: 'Adv',
+  preposition: 'Prep', conjunction: 'Conj', interjection: 'Interj', pronoun: 'Pron',
+  determiner: 'Det', auxiliary: 'Aux', number: 'Num',
 };
 
 function posLabel(pos) {
@@ -79,11 +80,16 @@ export class Flashcard {
   _build() {
     this._container.innerHTML = '';
 
+    // 全体レイアウトラッパー（評価ボタンをカードの3Dコンテキスト外に分離）
+    const layout = document.createElement('div');
+    layout.className = 'study-layout';
+    this._container.appendChild(layout);
+
     // プログレスバー
     this._progressBar = document.createElement('div');
     this._progressBar.className = 'study-progress-bar';
     this._progressBar.innerHTML = '<div class="study-progress-bar__fill" style="width:0%"></div>';
-    this._container.appendChild(this._progressBar);
+    layout.appendChild(this._progressBar);
 
     // カードシーン
     const scene = document.createElement('div');
@@ -102,7 +108,7 @@ export class Flashcard {
           <span class="card__number" data-number></span>
         </div>
         <div class="card__word-main" data-word></div>
-        <div class="card__hint">タップしてめくる</div>
+        <div class="card__hint">Tap to flip ▶</div>
       </div>
     `;
 
@@ -112,7 +118,7 @@ export class Flashcard {
     back.innerHTML = `
       <div class="card__back">
         <div class="card__word-small" data-word-back></div>
-        <button class="speak-btn" data-speak aria-label="発音">🔊</button>
+        <button class="speak-btn" data-speak aria-label="Pronounce">🔊</button>
         <div class="card__meaning" data-meaning></div>
         <div class="card__example" data-example style="display:none">
           <div class="card__example-hanzi" data-example-en></div>
@@ -124,29 +130,29 @@ export class Flashcard {
     this._card.appendChild(front);
     this._card.appendChild(back);
     scene.appendChild(this._card);
-    this._container.appendChild(scene);
+    layout.appendChild(scene);
 
-    // スワイプインジケーター
+    // スワイプインジケーター（カード内）
     const rightInd = document.createElement('div');
     rightInd.className = 'swipe-indicator swipe-indicator--right';
-    rightInd.textContent = '覚えた ✓';
+    rightInd.textContent = 'Got it ✓';
     this._card.appendChild(rightInd);
     this._rightIndicator = rightInd;
 
     const leftInd = document.createElement('div');
     leftInd.className = 'swipe-indicator swipe-indicator--left';
-    leftInd.textContent = 'まだまだ ✗';
+    leftInd.textContent = 'Not yet ✗';
     this._card.appendChild(leftInd);
     this._leftIndicator = leftInd;
 
-    // 評価ボタン
+    // 評価ボタン（layoutに直接追加 — カードの3D空間外）
     this._ratingContainer = document.createElement('div');
     this._ratingContainer.className = 'rating-container';
     this._ratingContainer.innerHTML = `
-      <button class="rating-btn rating-btn--not-yet" data-rating="not-yet">まだまだ</button>
-      <button class="rating-btn rating-btn--remembered" data-rating="remembered">覚えた</button>
+      <button class="rating-btn rating-btn--not-yet" data-rating="not-yet">Not yet</button>
+      <button class="rating-btn rating-btn--remembered" data-rating="remembered">Got it!</button>
     `;
-    this._container.appendChild(this._ratingContainer);
+    layout.appendChild(this._ratingContainer);
 
     this._setupEvents();
   }
@@ -187,15 +193,17 @@ export class Flashcard {
     wordEl.textContent = wordData.word;
 
     const len = wordData.word.length;
-    if (len > 12) {
+    wordEl.style.whiteSpace = 'nowrap';
+    if (len > 20) {
+      wordEl.style.fontSize = 'clamp(18px, 5vw, 28px)';
+    } else if (len > 15) {
+      wordEl.style.fontSize = 'clamp(22px, 6vw, 34px)';
+    } else if (len > 12) {
       wordEl.style.fontSize = 'clamp(28px, 7vw, 44px)';
-      wordEl.style.whiteSpace = 'normal';
     } else if (len > 8) {
       wordEl.style.fontSize = 'clamp(36px, 9vw, 56px)';
-      wordEl.style.whiteSpace = 'normal';
     } else {
       wordEl.style.fontSize = '';
-      wordEl.style.whiteSpace = '';
     }
 
     // 品詞バッジ
@@ -214,7 +222,12 @@ export class Flashcard {
 
     // 裏面
     this._card.querySelector('[data-word-back]').textContent = wordData.word;
-    this._card.querySelector('[data-meaning]').textContent = wordData.meaning_ja || '';
+    const settings = Store.getSettings();
+    const meaningSource = (settings.showFurigana && wordData.meaning_kana)
+      ? wordData.meaning_kana
+      : (wordData.meaning_ja || '');
+    const meaningHTML = escapeHTML(meaningSource).replace(/\n/g, '<br>');
+    this._card.querySelector('[data-meaning]').innerHTML = meaningHTML;
 
     const exEl = this._card.querySelector('[data-example]');
     if (wordData.example_sentence) {
@@ -233,7 +246,6 @@ export class Flashcard {
     setTimeout(() => { this._card.style.animation = ''; }, 300);
 
     // 自動音声
-    const settings = Store.getSettings();
     if (settings.autoplayAudio) {
       setTimeout(() => speakWord(wordData.word), 200);
     }

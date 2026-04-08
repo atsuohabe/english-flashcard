@@ -1,209 +1,272 @@
 #!/usr/bin/env python3
 """
 Excel (英単語マスタ) → vocab JSON 変換スクリプト
+対応形式: .xls (xlrd) / .xlsx (openpyxl)
+
 使い方:
-  python3 tools/convert_vocab.py
-      --xlsx english_words_master.xlsx   # Excelファイルのパス
-      --sheet "Sheet1"                   # 対象シート名（省略時は全シート）
-      --out  data/vocab.json             # 出力ファイル（省略時は自動分割）
+  python3 tools/convert_vocab.py --xlsx R3ver2_Habatanforstudents.xls
+
+列構成（兵庫版）:
+  番号 | 単語 | ☆ | 品詞 | 意味 | 用例 | ○ | (番号)
 """
 import argparse, json, re, sys
 from pathlib import Path
 
-try:
-    import openpyxl
-except ImportError:
-    sys.exit("openpyxl が必要です: pip install openpyxl")
-
 # ────────────────────────────────────────────────
-# シート名 → レベル判定
-# ────────────────────────────────────────────────
-LEVEL_MAP: list[tuple[str, int]] = [
-    ("level1", 1), ("level 1", 1), ("レベル1", 1), ("基礎", 1), ("初級", 1), ("beginner", 1),
-    ("level2", 2), ("level 2", 2), ("レベル2", 2), ("中級", 2), ("intermediate", 2),
-    ("level3", 3), ("level 3", 3), ("レベル3", 3), ("上級", 3), ("advanced", 3),
-    ("level4", 4), ("level 4", 4), ("レベル4", 4),
-    ("level5", 5), ("level 5", 5), ("レベル5", 5),
-]
-
-def sheet_level(sheet_name: str) -> int:
-    key = sheet_name.lower().strip()
-    for pattern, level in LEVEL_MAP:
-        if pattern.lower() in key:
-            return level
-    return 0  # 不明な場合は☆マークで判定
-
-# ────────────────────────────────────────────────
-# カテゴリマッピング
-# ────────────────────────────────────────────────
-CATEGORY_MAP: dict[str, str] = {
-    "動物": "animals",
-    "食べ物": "food", "食べ物・飲み物": "food", "飲み物": "food",
-    "家族": "family", "家族・人": "family", "人": "family",
-    "体": "body", "からだ": "body",
-    "色": "colors", "色・形": "colors", "形": "colors",
-    "数": "numbers", "数字": "numbers", "数・数え方": "numbers",
-    "学校": "school", "教育": "school",
-    "自然": "nature", "天気": "nature", "自然・天気": "nature",
-    "服": "clothes", "持ち物": "clothes", "服・持ち物": "clothes",
-    "動作": "actions", "動詞": "actions",
-    "家": "daily", "生活": "daily", "家・生活": "daily", "日常": "daily",
-    "あいさつ": "greetings", "表現": "greetings", "あいさつ・表現": "greetings",
-}
-
-def normalize_category(raw: str) -> str:
-    text = raw.strip()
-    # 完全一致
-    if text in CATEGORY_MAP:
-        return CATEGORY_MAP[text]
-    # 部分一致
-    for key, cat_id in CATEGORY_MAP.items():
-        if key in text:
-            return cat_id
-    # 英語カテゴリ名がそのまま使われている場合
-    lower = text.lower()
-    valid_ids = {"animals", "food", "family", "body", "colors", "numbers",
-                 "school", "nature", "clothes", "actions", "daily", "greetings"}
-    if lower in valid_ids:
-        return lower
-    return "greetings"  # デフォルト
-
-# ────────────────────────────────────────────────
-# 品詞マッピング
+# 品詞マッピング（日本語 → 英語）
 # ────────────────────────────────────────────────
 POS_MAP: dict[str, str] = {
-    "名詞": "noun", "n": "noun", "noun": "noun",
-    "動詞": "verb", "v": "verb", "verb": "verb",
-    "形容詞": "adjective", "adj": "adjective", "adjective": "adjective",
-    "副詞": "adverb", "adv": "adverb", "adverb": "adverb",
-    "前置詞": "preposition", "prep": "preposition",
-    "接続詞": "conjunction", "conj": "conjunction",
-    "間投詞": "interjection", "intj": "interjection",
-    "代名詞": "pronoun", "pron": "pronoun",
+    "名": "noun",
+    "動": "verb",
+    "形": "adjective",
+    "副": "adverb",
+    "前": "preposition",
+    "接": "conjunction",
+    "代": "pronoun",
+    "冠": "determiner",
+    "間": "interjection",
+    "助": "auxiliary",
+    "数": "number",
 }
 
 def normalize_pos(raw: str) -> str:
-    return POS_MAP.get(raw.strip().lower(), "noun")
+    """日本語品詞表記を英語に変換（複合品詞は最初のもの）"""
+    clean = raw.strip().replace('\n', '').replace('　', '').replace(' ', '')
+    # 複合品詞（例: "名・形"）→ 最初のものを使用
+    first = re.split(r'[・/·]', clean)[0].strip()
+    return POS_MAP.get(first, "noun")
 
 # ────────────────────────────────────────────────
-# ☆マーク検出
+# テキストクリーニング
 # ────────────────────────────────────────────────
-STAR_RE = re.compile(r'[☆★⭐✦✧◆◇]')
+def clean_text(text: str) -> str:
+    """改行、全角スペース、余分な空白を除去"""
+    text = str(text).strip()
+    text = text.replace('\n', ' ').replace('　', ' ')
+    text = re.sub(r'\s+', ' ', text)
+    return text.strip()
 
-def detect_star(text: str) -> tuple[str, bool]:
-    """テキストから☆マークを検出し、クリーンなテキストとフラグを返す"""
-    has_star = bool(STAR_RE.search(text))
-    cleaned = STAR_RE.sub('', text).strip()
-    return cleaned, has_star
+def clean_word(text: str) -> str:
+    """英単語のクリーニング（括弧内の注記も保持）"""
+    text = clean_text(text)
+    return text
 
-# ────────────────────────────────────────────────
-# ヘッダー列検出
-# ────────────────────────────────────────────────
-def _header_tokens(cell_str: str) -> list[str]:
-    tokens = []
-    for part in cell_str.replace('\n', ' ').split():
-        tokens.append(part.lower().strip())
-    return tokens
-
-def find_col(header: list[str], aliases: list[str]) -> int | None:
-    for alias in aliases:
-        al = alias.lower().strip()
-        for i, h in enumerate(header):
-            tokens = _header_tokens(h)
-            if al in tokens or al == h.lower().strip():
-                return i
-    return None
-
-# 列エイリアス定義
-WORD_ALIASES     = ["英単語", "english", "word", "単語", "英語", "vocabulary"]
-CATEGORY_ALIASES = ["分類", "category", "カテゴリ", "種類"]
-MEANING_ALIASES  = ["意味", "meaning", "日本語", "japanese", "和訳", "meaning_ja"]
-EXAMPLE_ALIASES  = ["例文", "example", "example sentence", "文例"]
-POS_ALIASES      = ["品詞", "part of speech", "pos", "詞類"]
-STAR_ALIASES     = ["☆", "★", "star", "初期", "レベル", "level", "優先"]
+def clean_meaning(text: str) -> str:
+    """意味のクリーニング（全行保持、※注記も保持）"""
+    text = str(text).strip()
+    text = text.replace('　', ' ')
+    lines = [line.strip() for line in text.split('\n') if line.strip()]
+    return '\n'.join(lines)
 
 # ────────────────────────────────────────────────
-# シート解析
+# .xls 読み込み (xlrd)
 # ────────────────────────────────────────────────
+def read_xls(path: Path) -> list[dict]:
+    try:
+        import xlrd
+    except ImportError:
+        sys.exit("xlrd が必要です: pip install xlrd")
 
-def parse_sheet(sheet, default_level: int, start_id: int) -> list[dict]:
-    rows = list(sheet.iter_rows(values_only=True))
-    if not rows:
-        return []
-
-    # ヘッダー行を探す
-    header_idx = 0
-    for idx, row in enumerate(rows[:5]):
-        tokens_in_row = []
-        for c in row:
-            if c:
-                tokens_in_row.extend(_header_tokens(str(c)))
-        if any(a.lower() in tokens_in_row for a in ["英単語", "english", "word", "単語"]):
-            header_idx = idx
-            break
-
-    header = [str(c).strip() if c else "" for c in rows[header_idx]]
-
-    ci_word     = find_col(header, WORD_ALIASES)
-    ci_category = find_col(header, CATEGORY_ALIASES)
-    ci_meaning  = find_col(header, MEANING_ALIASES)
-    ci_example  = find_col(header, EXAMPLE_ALIASES)
-    ci_pos      = find_col(header, POS_ALIASES)
-    ci_star     = find_col(header, STAR_ALIASES)
-
-    print(f"     列検出: word={ci_word} category={ci_category} meaning={ci_meaning} "
-          f"example={ci_example} pos={ci_pos} star={ci_star}")
-
-    if ci_word is None:
-        print(f"  ⚠️  英単語列が見つかりません（シート: {sheet.title}）。スキップします。")
-        print(f"     ヘッダー: {header}")
-        return []
-
-    def cell(row, idx) -> str:
-        if idx is None or idx >= len(row) or row[idx] is None:
-            return ""
-        return str(row[idx]).strip()
-
+    wb = xlrd.open_workbook(str(path))
     words = []
-    word_id = start_id
-    for row in rows[header_idx + 1:]:
-        if not row:
+    word_id = 1
+
+    for sheet_idx in range(wb.nsheets):
+        sh = wb.sheet_by_index(sheet_idx)
+        print(f"   シート: 「{sh.name}」 ({sh.nrows}行)")
+
+        # ヘッダー行を探す（番号/単語 が含まれる行）
+        header_row = 0
+        for r in range(min(5, sh.nrows)):
+            row_vals = [str(sh.cell_value(r, c)).strip() for c in range(sh.ncols)]
+            # セル値が単語/word と完全一致するものを探す（タイトル行の「英単語集」等を除外）
+            if any(v in ('単語', '単\u3000語', 'word', 'Word', 'english', 'English') for v in row_vals):
+                header_row = r
+                break
+
+        header = [str(sh.cell_value(header_row, c)).replace('　', '').strip()
+                  for c in range(sh.ncols)]
+        print(f"   ヘッダー: {header}")
+
+        # 列インデックス検出
+        def find_col(aliases):
+            for alias in aliases:
+                for i, h in enumerate(header):
+                    if alias in h.lower() or h == alias:
+                        return i
+            return None
+
+        ci_word    = find_col(['単語', 'word', 'english', '単\u3000語'])
+        ci_star    = find_col(['☆', '★', 'star'])
+        ci_pos     = find_col(['品詞', 'pos', 'part'])
+        ci_meaning = find_col(['意味', 'meaning', '意\u3000味'])
+        ci_example = find_col(['用例', 'example', '用\u3000例'])
+
+        # ヘッダー検出失敗時のフォールバック（固定列）
+        # 兵庫版: 番号(0) 単語(1) ☆(2) 品詞(3) 意味(4) 用例(5) ○(6) 番号(7)
+        if ci_word is None:
+            ci_word = 1
+        if ci_star is None:
+            ci_star = 2
+        if ci_pos is None:
+            ci_pos = 3
+        if ci_meaning is None:
+            ci_meaning = 4
+        if ci_example is None:
+            ci_example = 5
+
+        print(f"   列検出: word={ci_word} star={ci_star} pos={ci_pos} "
+              f"meaning={ci_meaning} example={ci_example}")
+
+        star_count = 0
+        skipped = 0
+
+        for r in range(header_row + 1, sh.nrows):
+            raw_word = str(sh.cell_value(r, ci_word)).strip()
+            if not raw_word or raw_word in ('', 'None'):
+                skipped += 1
+                continue
+
+            # ☆マーク（専用列）
+            star_val = str(sh.cell_value(r, ci_star)).strip()
+            is_starter = bool(star_val and star_val not in ('', 'None', '0'))
+
+            word_text = clean_word(raw_word)
+            if not word_text:
+                skipped += 1
+                continue
+
+            meaning_raw = str(sh.cell_value(r, ci_meaning)).strip()
+            meaning_ja = clean_meaning(meaning_raw) if meaning_raw else ''
+
+            pos_raw = str(sh.cell_value(r, ci_pos)).strip()
+            pos = normalize_pos(pos_raw) if pos_raw and pos_raw != 'None' else 'noun'
+
+            example_raw = str(sh.cell_value(r, ci_example)).strip()
+            example = clean_text(example_raw) if example_raw and example_raw != 'None' else ''
+
+            level = 1 if is_starter else 2
+            if is_starter:
+                star_count += 1
+
+            words.append({
+                "id":               word_id,
+                "word":             word_text,
+                "meaning_ja":       meaning_ja,
+                "meaning_kana":     "",
+                "part_of_speech":   pos,
+                "category":         "general",
+                "example_sentence": example,
+                "frequency_rank":   word_id,
+                "difficulty":       level,
+                "level":            level,
+                "is_starter":       is_starter,
+            })
+            word_id += 1
+
+        print(f"   → {word_id - 1} 語（☆: {star_count} 語、スキップ: {skipped} 行）")
+
+    return words
+
+# ────────────────────────────────────────────────
+# .xlsx 読み込み (openpyxl)
+# ────────────────────────────────────────────────
+def read_xlsx(path: Path) -> list[dict]:
+    try:
+        import openpyxl
+    except ImportError:
+        sys.exit("openpyxl が必要です: pip install openpyxl")
+
+    wb = openpyxl.load_workbook(path, read_only=True, data_only=True)
+    words = []
+    word_id = 1
+
+    for sheet in wb.worksheets:
+        rows = list(sheet.iter_rows(values_only=True))
+        if not rows:
             continue
-        raw_word = cell(row, ci_word)
-        if not raw_word:
-            continue
+        print(f"   シート: 「{sheet.title}」 ({len(rows)}行)")
 
-        # ☆マーク検出（英単語列から）
-        word_text, has_star_in_word = detect_star(raw_word)
+        # ヘッダー行を探す
+        header_idx = 0
+        for idx, row in enumerate(rows[:5]):
+            tokens = [str(c).strip() for c in row if c]
+            # セル値が単語/word と完全一致するものを探す
+            if any(t in ('単語', '単\u3000語', 'word', 'Word', 'english', 'English') for t in tokens):
+                header_idx = idx
+                break
 
-        # 専用☆列がある場合
-        has_star_in_col = False
-        if ci_star is not None:
-            star_val = cell(row, ci_star)
-            has_star_in_col = bool(STAR_RE.search(star_val)) or star_val in ('1', 'yes', 'YES', 'Yes', '○', '◯', 'TRUE', 'true')
+        header = [str(c).strip() if c else '' for c in rows[header_idx]]
 
-        is_starter = has_star_in_word or has_star_in_col
+        ci_word = ci_star = ci_pos = ci_meaning = ci_example = None
+        for i, h in enumerate(header):
+            hl = h.lower().replace('　', '').replace(' ', '')
+            if '単語' in hl or hl in ('word', 'english'):
+                ci_word = i
+            elif '☆' in h or '★' in h:
+                ci_star = i
+            elif '品詞' in hl or 'pos' in hl:
+                ci_pos = i
+            elif '意味' in hl or 'meaning' in hl:
+                ci_meaning = i
+            elif '用例' in hl or 'example' in hl:
+                ci_example = i
 
-        # レベル判定: ☆あり → level 1, なし → default_level or 2
-        level = 1 if is_starter else (default_level if default_level > 0 else 2)
+        if ci_word is None:
+            ci_word = 1
+        if ci_star is None:
+            ci_star = 2
+        if ci_pos is None:
+            ci_pos = 3
+        if ci_meaning is None:
+            ci_meaning = 4
+        if ci_example is None:
+            ci_example = 5
 
-        category_raw = cell(row, ci_category)
-        pos_raw = cell(row, ci_pos)
+        star_count = 0
+        for row in rows[header_idx + 1:]:
+            def cell(idx):
+                if idx is None or idx >= len(row) or row[idx] is None:
+                    return ''
+                return str(row[idx]).strip()
 
-        words.append({
-            "id":               word_id,
-            "word":             word_text,
-            "meaning_ja":       cell(row, ci_meaning),
-            "part_of_speech":   normalize_pos(pos_raw) if pos_raw else "noun",
-            "category":         normalize_category(category_raw) if category_raw else "greetings",
-            "example_sentence": cell(row, ci_example),
-            "frequency_rank":   word_id,
-            "difficulty":       level,
-            "level":            level,
-            "is_starter":       is_starter,
-        })
-        word_id += 1
+            raw_word = cell(ci_word)
+            if not raw_word:
+                continue
 
+            star_val = cell(ci_star)
+            is_starter = bool(star_val and star_val not in ('', '0'))
+
+            word_text = clean_word(raw_word)
+            if not word_text:
+                continue
+
+            meaning_ja = clean_meaning(cell(ci_meaning))
+            pos = normalize_pos(cell(ci_pos)) if cell(ci_pos) else 'noun'
+            example = clean_text(cell(ci_example)) if cell(ci_example) else ''
+
+            level = 1 if is_starter else 2
+            if is_starter:
+                star_count += 1
+
+            words.append({
+                "id":               word_id,
+                "word":             word_text,
+                "meaning_ja":       meaning_ja,
+                "meaning_kana":     "",
+                "part_of_speech":   pos,
+                "category":         "general",
+                "example_sentence": example,
+                "frequency_rank":   word_id,
+                "difficulty":       level,
+                "level":            level,
+                "is_starter":       is_starter,
+            })
+            word_id += 1
+
+        print(f"   → {word_id - 1} 語（☆: {star_count} 語）")
+
+    wb.close()
     return words
 
 # ────────────────────────────────────────────────
@@ -212,9 +275,9 @@ def parse_sheet(sheet, default_level: int, start_id: int) -> list[dict]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Excel → vocab JSON 変換")
-    parser.add_argument("--xlsx",  default="english_words_master.xlsx", help="Excelファイルのパス")
-    parser.add_argument("--sheet", default=None,                        help="対象シート名（省略時は全シート）")
-    parser.add_argument("--out",   default=None,                        help="出力JSONパス（省略時は自動分割）")
+    parser.add_argument("--xlsx", default="R3ver2_Habatanforstudents.xls",
+                        help="Excelファイルのパス")
+    parser.add_argument("--out", default=None, help="出力JSONパス（省略時は自動分割）")
     args = parser.parse_args()
 
     xlsx_path = Path(args.xlsx)
@@ -222,30 +285,24 @@ def main() -> None:
         sys.exit(f"❌  Excelファイルが見つかりません: {xlsx_path}")
 
     print(f"📂  {xlsx_path} を読み込み中...")
-    wb = openpyxl.load_workbook(xlsx_path, read_only=True, data_only=True)
-    print(f"   シート一覧: {wb.sheetnames}")
 
-    words: list[dict] = []
-    word_id = 1
-
-    for sheet in wb.worksheets:
-        if args.sheet and sheet.title != args.sheet:
-            continue
-        default_level = sheet_level(sheet.title)
-        print(f"   処理中: 「{sheet.title}」 (default_level={default_level})")
-        sheet_words = parse_sheet(sheet, default_level, word_id)
-        print(f"   → {len(sheet_words)} 語（☆初期: {sum(1 for w in sheet_words if w['is_starter'])} 語）")
-        words.extend(sheet_words)
-        word_id += len(sheet_words)
-
-    wb.close()
+    suffix = xlsx_path.suffix.lower()
+    if suffix == '.xls':
+        words = read_xls(xlsx_path)
+    elif suffix in ('.xlsx', '.xlsm'):
+        words = read_xlsx(xlsx_path)
+    else:
+        sys.exit(f"❌  未対応のファイル形式: {suffix}")
 
     if not words:
         sys.exit("❌  単語が1件も取得できませんでした。")
 
-    print(f"\n合計 {len(words)} 語を読み込みました")
-    print(f"  ☆初期レベル: {sum(1 for w in words if w['level'] == 1)} 語")
-    print(f"  通常レベル:   {sum(1 for w in words if w['level'] == 2)} 語")
+    total = len(words)
+    level1 = sum(1 for w in words if w['level'] == 1)
+    level2 = sum(1 for w in words if w['level'] == 2)
+    print(f"\n合計 {total} 語")
+    print(f"  ☆ レベル1（初期）: {level1} 語")
+    print(f"  　 レベル2（通常）: {level2} 語")
 
     out_dir = Path("data")
     out_dir.mkdir(exist_ok=True)
@@ -253,16 +310,18 @@ def main() -> None:
     if args.out:
         out_path = Path(args.out)
         out_path.write_text(json.dumps(words, ensure_ascii=False, indent=2), encoding="utf-8")
-        print(f"✅  {out_path}: {len(words)} 語")
+        print(f"✅  {out_path}: {total} 語")
     else:
-        # レベル別に分割
-        levels_found = sorted(set(w["level"] for w in words))
-        for lvl in levels_found:
-            chunk = [w for w in words if w["level"] == lvl]
-            if chunk:
-                path = out_dir / f"vocab-level{lvl}.json"
-                path.write_text(json.dumps(chunk, ensure_ascii=False, indent=2), encoding="utf-8")
-                print(f"✅  {path}: {len(chunk)} 語")
+        for lvl in sorted(set(w['level'] for w in words)):
+            chunk = [w for w in words if w['level'] == lvl]
+            path = out_dir / f"vocab-level{lvl}.json"
+            path.write_text(json.dumps(chunk, ensure_ascii=False, indent=2), encoding="utf-8")
+            print(f"✅  {path}: {len(chunk)} 語")
+
+    # サンプル表示
+    print("\n=== 変換サンプル（最初の3件）===")
+    for w in words[:3]:
+        print(json.dumps(w, ensure_ascii=False))
 
 
 if __name__ == "__main__":

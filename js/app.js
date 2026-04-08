@@ -23,9 +23,9 @@ import { attachKeyboard } from './gestures.js';
 const VERSION = '1.0.0';
 
 const LEVEL_OPTIONS = [
-  { value: 'all',    label: '全レベル' },
-  { value: 'level1', label: '☆ 初期レベル' },
-  { value: 'level2', label: '通常レベル' },
+  { value: 'all',    label: 'All levels' },
+  { value: 'level1', label: '☆ Starter' },
+  { value: 'level2', label: 'Standard' },
 ];
 
 // ─── 状態 ────────────────────────────────────────────────────────────
@@ -78,7 +78,7 @@ async function init() {
 
   // 自動アップデートトースト
   window.__showUpdateToast = (version) => {
-    showToast(`新バージョン v${version} をダウンロードしました。再起動で更新されます。`, {
+    showToast(`Version v${version} downloaded. Restart to update.`, {
       type: 'info',
       duration: 8000,
     });
@@ -95,6 +95,14 @@ function _setupNavigation() {
       const view = el.dataset.nav;
       _navigateTo(view);
     });
+  });
+
+  // SVG アイコン注入
+  document.querySelectorAll('[data-nav]').forEach(el => {
+    const iconSpan = el.querySelector('.nav-bottom__icon, .nav-sidebar__icon');
+    if (iconSpan && ICONS[el.dataset.nav]) {
+      iconSpan.innerHTML = ICONS[el.dataset.nav];
+    }
   });
 
   // ハッシュ変更
@@ -161,8 +169,8 @@ function _renderHome() {
     <div class="page page--study">
       <div class="dashboard-hero">
         <span class="level-badge" data-nav="settings">${escapeHTML(levelLabel)}</span>
-        <h1 class="dashboard-hero__title">英単語フラッシュカード</h1>
-        <p class="dashboard-hero__subtitle">間隔反復で英単語をマスターしよう</p>
+        <h1 class="dashboard-hero__title">English Flashcards</h1>
+        <p class="dashboard-hero__subtitle">Practice every day to master English words</p>
 
         <div class="dashboard-hero__ring">
           <svg class="progress-ring" viewBox="0 0 160 160">
@@ -171,9 +179,9 @@ function _renderHome() {
               stroke-dasharray="${circumference}" stroke-dashoffset="${learningOffset}"/>
             <circle class="progress-ring__track--mastered" cx="80" cy="80" r="65"
               stroke-dasharray="${circumference}" stroke-dashoffset="${masteredOffset}"/>
-            <g class="progress-ring__text" transform="rotate(90 80 80)">
+            <g class="progress-ring__text">
               <text class="progress-ring__number" x="80" y="75">${overview.mastered}</text>
-              <text class="progress-ring__label" x="80" y="95">/ ${totalWords} 語</text>
+              <text class="progress-ring__label" x="80" y="95">/ ${totalWords}</text>
             </g>
           </svg>
         </div>
@@ -181,16 +189,16 @@ function _renderHome() {
         <div class="queue-row">
           <div class="queue-pill">
             <span class="queue-pill__number">${dueCount}</span>
-            <span class="queue-pill__label">復習</span>
+            <span class="queue-pill__label">Review</span>
           </div>
           <div class="queue-pill">
             <span class="queue-pill__number">${newCount}</span>
-            <span class="queue-pill__label">新規</span>
+            <span class="queue-pill__label">New</span>
           </div>
         </div>
 
         <button class="btn btn--primary btn--lg btn--full" data-action="start-study">
-          学習を始める
+          Start Study
         </button>
       </div>
     </div>
@@ -227,9 +235,9 @@ async function _startStudy() {
       <div class="page page--study">
         <div class="empty-state">
           <div class="empty-state__icon">🎉</div>
-          <h2 class="empty-state__title">今日の学習は完了！</h2>
-          <p class="text-muted">また明日チャレンジしましょう</p>
-          <button class="btn btn--primary" style="margin-top:var(--space-6)" data-action="go-home">ホームへ戻る</button>
+          <h2 class="empty-state__title">All done for today!</h2>
+          <p class="text-muted">Come back tomorrow</p>
+          <button class="btn btn--primary" style="margin-top:var(--space-6)" data-action="go-home">Back to Home</button>
         </div>
       </div>
     `;
@@ -289,7 +297,7 @@ function _onCardRated(rating) {
 function _onUndo() {
   if (Session.undo()) {
     _showNextCard();
-    showToast('1つ戻しました', { type: 'info', duration: 1500 });
+    showToast('Undone', { type: 'info', duration: 1500 });
   }
 }
 
@@ -301,23 +309,23 @@ function _showSessionComplete() {
     <div class="page page--study">
       <div class="session-complete">
         <div class="session-complete__emoji">🎊</div>
-        <h2 class="session-complete__title">セッション完了！</h2>
+        <h2 class="session-complete__title">Session complete!</h2>
         <div class="session-complete__stats">
           <div class="session-complete__stat">
             <div class="session-complete__stat-number">${stats.reviewed}</div>
-            <div class="session-complete__stat-label">復習</div>
+            <div class="session-complete__stat-label">Reviewed</div>
           </div>
           <div class="session-complete__stat">
             <div class="session-complete__stat-number">${stats.retention}%</div>
-            <div class="session-complete__stat-label">正答率</div>
+            <div class="session-complete__stat-label">Accuracy</div>
           </div>
           <div class="session-complete__stat">
             <div class="session-complete__stat-number">${stats.newCards}</div>
-            <div class="session-complete__stat-label">新規</div>
+            <div class="session-complete__stat-label">New</div>
           </div>
         </div>
-        <button class="btn btn--primary btn--full" data-action="go-home" style="margin-top:var(--space-6)">ホームへ戻る</button>
-        <button class="btn btn--secondary btn--full" data-action="study-again" style="margin-top:var(--space-3)">もう一度学習</button>
+        <button class="btn btn--primary btn--full" data-action="go-home" style="margin-top:var(--space-6)">Back to Home</button>
+        <button class="btn btn--secondary btn--full" data-action="study-again" style="margin-top:var(--space-3)">Study again</button>
       </div>
     </div>
   `;
@@ -354,81 +362,107 @@ function _renderBrowse() {
 
   container.innerHTML = `
     <div class="page">
-      <h1 class="page-title">単語一覧</h1>
+      <h1 class="page-title">Word List</h1>
       <div class="browse-search-wrap">
-        <input class="browse-search" type="search" placeholder="英単語・意味で検索..." data-search>
+        <input class="browse-search" type="search" placeholder="Search words..." data-search>
       </div>
-      <div class="category-pills-scroll" data-categories></div>
-      <div class="text-sm text-muted" style="margin:var(--space-2) 0" data-count>${words.length} 語</div>
+      <div class="category-pills-scroll" data-filters></div>
+      <div class="text-sm text-muted" style="margin:var(--space-2) 0" data-count>${words.length} words</div>
       <div class="card-grid" data-word-list></div>
+      <div class="text-center" style="margin-top:var(--space-4)" data-load-more-wrap></div>
     </div>
   `;
 
   const searchInput = container.querySelector('[data-search]');
   const wordList = container.querySelector('[data-word-list]');
   const countEl = container.querySelector('[data-count]');
-  const catContainer = container.querySelector('[data-categories]');
+  const filterContainer = container.querySelector('[data-filters]');
+  const loadMoreWrap = container.querySelector('[data-load-more-wrap]');
 
-  let selectedCategory = null;
+  let selectedFilter = '';
+  let displayLimit = 200;
 
-  // カテゴリピル
-  _renderCategoryPills(catContainer, (catId) => {
-    selectedCategory = catId;
+  // SRS状態フィルタピル
+  _renderSRSFilterPills(filterContainer, (filter) => {
+    selectedFilter = filter;
+    displayLimit = 200;
     filterAndRender();
   });
 
   function filterAndRender() {
     const query = searchInput.value.trim();
     let filtered = query ? Vocab.search(query) : Vocab.getFilteredWords(studyLevel);
-    if (selectedCategory) {
-      filtered = filtered.filter(w => w.category === selectedCategory);
+
+    if (selectedFilter) {
+      filtered = filtered.filter(w => {
+        const srs = Store.getCard(String(w.id));
+        if (selectedFilter === 'new') return !srs;
+        if (selectedFilter === 'learning') return srs && [STATE.LEARNING, STATE.YOUNG, STATE.RELEARN].includes(srs.state);
+        if (selectedFilter === 'mastered') return srs && [STATE.MATURE, STATE.BURNED].includes(srs.state);
+        return true;
+      });
     }
-    countEl.textContent = `${filtered.length} 語`;
-    _renderWordCards(wordList, filtered.slice(0, 100));
+
+    countEl.textContent = `${filtered.length} words`;
+    _renderWordCards(wordList, filtered.slice(0, displayLimit));
+
+    // 「もっと見る」ボタン
+    if (filtered.length > displayLimit) {
+      loadMoreWrap.innerHTML = `<button class="btn btn--secondary btn--sm" data-action="load-more">Load more (${filtered.length - displayLimit} remaining)</button>`;
+      loadMoreWrap.querySelector('[data-action="load-more"]').addEventListener('click', () => {
+        displayLimit += 200;
+        filterAndRender();
+      });
+    } else {
+      loadMoreWrap.innerHTML = '';
+    }
   }
 
-  searchInput.addEventListener('input', filterAndRender);
+  searchInput.addEventListener('input', () => {
+    displayLimit = 200;
+    filterAndRender();
+  });
   filterAndRender();
 }
 
-function _renderCategoryPills(container, onSelect) {
-  // カテゴリデータを読み込み
-  fetch('./data/categories.json')
-    .then(r => r.json())
-    .then(data => {
-      const cats = data.categories || [];
-      let html = '<button class="category-pill active" data-cat="">すべて</button>';
-      for (const cat of cats) {
-        html += `<button class="category-pill" data-cat="${escapeHTML(cat.id)}">${escapeHTML(cat.name_ja)}</button>`;
-      }
-      container.innerHTML = html;
+function _renderSRSFilterPills(container, onSelect) {
+  const filters = [
+    { value: '', label: 'All' },
+    { value: 'new', label: 'New' },
+    { value: 'learning', label: 'Learning' },
+    { value: 'mastered', label: 'Mastered' },
+  ];
 
-      container.addEventListener('click', (e) => {
-        const pill = e.target.closest('[data-cat]');
-        if (!pill) return;
-        container.querySelectorAll('.category-pill').forEach(p => p.classList.remove('active'));
-        pill.classList.add('active');
-        onSelect(pill.dataset.cat || null);
-      });
-    })
-    .catch(() => {});
+  let html = '';
+  for (const f of filters) {
+    html += `<button class="category-pill${f.value === '' ? ' active' : ''}" data-filter="${f.value}">${escapeHTML(f.label)}</button>`;
+  }
+  container.innerHTML = html;
+
+  container.addEventListener('click', (e) => {
+    const pill = e.target.closest('[data-filter]');
+    if (!pill) return;
+    container.querySelectorAll('.category-pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    onSelect(pill.dataset.filter || '');
+  });
 }
 
 function _renderWordCards(container, words) {
+  const settings = Store.getSettings();
   let html = '';
   for (const w of words) {
     const srs = Store.getCard(String(w.id));
     const stateClass = srs ? `word-card__state--${srs.state || 'new'}` : 'word-card__state--new';
+    const meaning = (settings.showFurigana && w.meaning_kana) ? w.meaning_kana : (w.meaning_ja || '');
 
     html += `
       <div class="word-card" data-word-id="${w.id}">
-        <div class="word-card__top">
-          <div>
-            <div class="word-card__word">${escapeHTML(w.word)}</div>
-            <div class="word-card__meaning">${escapeHTML(w.meaning_ja || '')}</div>
-          </div>
+        <div class="word-card__header">
+          <div class="word-card__word">${escapeHTML(w.word)}</div>
           <button class="word-card__speak-btn" data-speak="${escapeHTML(w.word)}">🔊</button>
         </div>
+        <div class="word-card__meaning">${escapeHTML(meaning).replace(/\n/g, '<br>')}</div>
         <span class="word-card__state ${stateClass}"></span>
       </div>
     `;
@@ -464,13 +498,13 @@ function _renderSettings() {
 
   container.innerHTML = `
     <div class="page">
-      <h1 class="page-title">設定</h1>
+      <h1 class="page-title">Settings</h1>
 
       <div class="surface-card">
         <div class="settings-row">
           <div>
-            <div class="settings-row__label">学習レベル</div>
-            <div class="settings-row__desc">学習する単語の範囲</div>
+            <div class="settings-row__label">Study Level</div>
+            <div class="settings-row__desc">Word range to study</div>
           </div>
           <select class="select" data-setting="studyLevel">
             ${LEVEL_OPTIONS.map(o =>
@@ -481,35 +515,35 @@ function _renderSettings() {
 
         <div class="settings-row">
           <div>
-            <div class="settings-row__label">1日の新規カード数</div>
-            <div class="settings-row__desc">1日に導入する新しい単語の上限</div>
+            <div class="settings-row__label">Daily New Cards</div>
+            <div class="settings-row__desc">Max new words per day</div>
           </div>
           <select class="select" data-setting="dailyNewLimit">
             ${[5, 10, 15, 20, 30].map(n =>
-              `<option value="${n}" ${settings.dailyNewLimit === n ? 'selected' : ''}>${n}枚</option>`
+              `<option value="${n}" ${settings.dailyNewLimit === n ? 'selected' : ''}>${n} cards</option>`
             ).join('')}
           </select>
         </div>
 
         <div class="settings-row">
           <div>
-            <div class="settings-row__label">1日の復習上限</div>
-            <div class="settings-row__desc">1日に復習するカードの上限</div>
+            <div class="settings-row__label">Daily Review Limit</div>
+            <div class="settings-row__desc">Max reviews per day</div>
           </div>
           <select class="select" data-setting="dailyReviewLimit">
-            ${[50, 100, 150, 200].map(n =>
-              `<option value="${n}" ${settings.dailyReviewLimit === n ? 'selected' : ''}>${n}枚</option>`
+            ${[10, 20, 50, 100, 150, 200].map(n =>
+              `<option value="${n}" ${settings.dailyReviewLimit === n ? 'selected' : ''}>${n} cards</option>`
             ).join('')}
           </select>
         </div>
 
         <div class="settings-row">
           <div>
-            <div class="settings-row__label">カード順序</div>
+            <div class="settings-row__label">Card Order</div>
           </div>
           <select class="select" data-setting="cardOrder">
-            <option value="sequential" ${settings.cardOrder === 'sequential' ? 'selected' : ''}>順番通り</option>
-            <option value="random" ${settings.cardOrder === 'random' ? 'selected' : ''}>ランダム</option>
+            <option value="sequential" ${settings.cardOrder === 'sequential' ? 'selected' : ''}>Sequential</option>
+            <option value="random" ${settings.cardOrder === 'random' ? 'selected' : ''}>Random</option>
           </select>
         </div>
 
@@ -517,19 +551,19 @@ function _renderSettings() {
 
         <div class="settings-row">
           <div>
-            <div class="settings-row__label">テーマ</div>
+            <div class="settings-row__label">Theme</div>
           </div>
           <select class="select" data-setting="theme">
-            <option value="auto" ${settings.theme === 'auto' ? 'selected' : ''}>自動</option>
-            <option value="light" ${settings.theme === 'light' ? 'selected' : ''}>ライト</option>
-            <option value="dark" ${settings.theme === 'dark' ? 'selected' : ''}>ダーク</option>
+            <option value="auto" ${settings.theme === 'auto' ? 'selected' : ''}>Auto</option>
+            <option value="light" ${settings.theme === 'light' ? 'selected' : ''}>Light</option>
+            <option value="dark" ${settings.theme === 'dark' ? 'selected' : ''}>Dark</option>
           </select>
         </div>
 
         <div class="settings-row">
           <div>
-            <div class="settings-row__label">自動音声</div>
-            <div class="settings-row__desc">カード表示時に英単語を自動読み上げ</div>
+            <div class="settings-row__label">Auto Speech</div>
+            <div class="settings-row__desc">Auto-play pronunciation when card is shown</div>
           </div>
           <label class="toggle">
             <input class="toggle__input" type="checkbox" data-setting="autoplayAudio" ${settings.autoplayAudio ? 'checked' : ''}>
@@ -539,7 +573,7 @@ function _renderSettings() {
 
         <div class="settings-row">
           <div>
-            <div class="settings-row__label">読み上げ速度</div>
+            <div class="settings-row__label">Speech Rate</div>
           </div>
           <select class="select" data-setting="ttsRate">
             ${[0.7, 0.8, 0.9, 1.0, 1.1, 1.2].map(r =>
@@ -548,39 +582,70 @@ function _renderSettings() {
           </select>
         </div>
 
+        <div class="settings-row">
+          <div>
+            <div class="settings-row__label">Kana Mode</div>
+            <div class="settings-row__desc">Show meanings in hiragana/katakana (when available)</div>
+          </div>
+          <label class="toggle">
+            <input class="toggle__input" type="checkbox" data-setting="showFurigana" ${settings.showFurigana ? 'checked' : ''}>
+            <span class="toggle__slider"></span>
+          </label>
+        </div>
+
         <div class="divider"></div>
 
         <div class="settings-row">
           <div>
-            <div class="settings-row__label">データエクスポート</div>
-            <div class="settings-row__desc">学習進捗をJSONで保存</div>
+            <div class="settings-row__label">Share App</div>
+            <div class="settings-row__desc">Tell friends about this app</div>
+          </div>
+          <button class="btn btn--secondary btn--sm" data-action="share">
+            ${ICONS.share} Share
+          </button>
+        </div>
+
+        <div class="settings-row">
+          <div>
+            <div class="settings-row__label">Update App</div>
+            <div class="settings-row__desc">Check for updates</div>
+          </div>
+          <button class="btn btn--secondary btn--sm" data-action="update-app">Update</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="settings-row">
+          <div>
+            <div class="settings-row__label">Export Data</div>
+            <div class="settings-row__desc">Save progress as JSON</div>
           </div>
           <button class="btn btn--secondary btn--sm" data-action="export">
-            ${ICONS.download} エクスポート
+            ${ICONS.download} Export
           </button>
         </div>
 
         <div class="settings-row">
           <div>
-            <div class="settings-row__label">データインポート</div>
-            <div class="settings-row__desc">保存した進捗を復元</div>
+            <div class="settings-row__label">Import Data</div>
+            <div class="settings-row__desc">Restore saved progress</div>
           </div>
           <button class="btn btn--secondary btn--sm" data-action="import">
-            ${ICONS.upload} インポート
+            ${ICONS.upload} Import
           </button>
         </div>
 
         <div class="settings-row">
           <div>
-            <div class="settings-row__label">データリセット</div>
-            <div class="settings-row__desc">全ての学習データを削除</div>
+            <div class="settings-row__label">Reset Data</div>
+            <div class="settings-row__desc">Delete all study data</div>
           </div>
-          <button class="btn btn--secondary btn--sm" style="color:#F44336" data-action="reset">リセット</button>
+          <button class="btn btn--secondary btn--sm" style="color:#F44336" data-action="reset">Reset</button>
         </div>
       </div>
 
       <div class="text-center text-xs text-muted" style="margin-top:var(--space-6)">
-        英単語フラッシュカード v${VERSION}
+        English Flashcards v${VERSION}
         <span data-app-version></span>
       </div>
     </div>
@@ -609,13 +674,59 @@ function _renderSettings() {
         applyTheme(value);
       }
 
+      if (key === 'showFurigana') {
+        showToast(value ? 'Kana mode ON' : 'Kana mode OFF', { type: 'info', duration: 1500 });
+      }
+
       if (key === 'studyLevel') {
-        // 新レベルのデータをロード
         Vocab.loadForLevel(value).then(() => {
-          showToast('学習レベルを変更しました', { type: 'success', duration: 2000 });
+          showToast('Study level changed', { type: 'success', duration: 2000 });
         });
       }
     });
+  });
+
+  // 共有
+  container.querySelector('[data-action="share"]')?.addEventListener('click', async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'English Flashcards',
+          text: 'Learn English words the fun way!',
+          url: window.location.href,
+        });
+      } catch (e) {
+        if (e.name !== 'AbortError') {
+          showToast('Share failed', { type: 'warning' });
+        }
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        showToast('URL copied', { type: 'success' });
+      } catch {
+        showToast('Copy failed', { type: 'warning' });
+      }
+    }
+  });
+
+  // アプリ更新
+  container.querySelector('[data-action="update-app"]')?.addEventListener('click', async () => {
+    try {
+      if ('serviceWorker' in navigator) {
+        const reg = await navigator.serviceWorker.getRegistration();
+        if (reg) {
+          await reg.update();
+          const keys = await caches.keys();
+          await Promise.all(keys.map(k => caches.delete(k)));
+        }
+      }
+      showToast('Updating... page will reload', { type: 'info' });
+      setTimeout(() => window.location.reload(), 1000);
+    } catch (e) {
+      console.error('Update failed:', e);
+      window.location.reload();
+    }
   });
 
   // エクスポート
@@ -628,7 +739,7 @@ function _renderSettings() {
     a.download = `efc-backup-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    showToast('エクスポートしました', { type: 'success' });
+    showToast('Exported', { type: 'success' });
   });
 
   // インポート
@@ -642,10 +753,10 @@ function _renderSettings() {
       const reader = new FileReader();
       reader.onload = () => {
         if (Store.importData(reader.result)) {
-          showToast('インポートしました。ページを再読み込みします。', { type: 'success' });
+          showToast('Imported. Page will reload.', { type: 'success' });
           setTimeout(() => window.location.reload(), 1500);
         } else {
-          showToast('インポートに失敗しました', { type: 'warning' });
+          showToast('Import failed', { type: 'warning' });
         }
       };
       reader.readAsText(file);
@@ -655,11 +766,11 @@ function _renderSettings() {
 
   // リセット
   container.querySelector('[data-action="reset"]')?.addEventListener('click', () => {
-    showModal('データリセット', `
-      <p style="margin-bottom:var(--space-4)">全ての学習データが削除されます。この操作は取り消せません。</p>
+    showModal('Reset Data', `
+      <p style="margin-bottom:var(--space-4)">All study data will be deleted. This cannot be undone.</p>
       <div style="display:flex;gap:var(--space-3)">
-        <button class="btn btn--secondary btn--full" data-modal-cancel>キャンセル</button>
-        <button class="btn btn--primary btn--full" style="background:#F44336;border-color:#F44336" data-modal-confirm>リセット</button>
+        <button class="btn btn--secondary btn--full" data-modal-cancel>Cancel</button>
+        <button class="btn btn--primary btn--full" style="background:#F44336;border-color:#F44336" data-modal-confirm>Reset</button>
       </div>
     `, {
       onClose: () => {},
@@ -667,7 +778,7 @@ function _renderSettings() {
 
     document.querySelector('[data-modal-confirm]')?.addEventListener('click', () => {
       Store.resetAll();
-      showToast('データをリセットしました', { type: 'success' });
+      showToast('Data has been reset', { type: 'success' });
       setTimeout(() => window.location.reload(), 1000);
     });
 
@@ -689,4 +800,16 @@ if ('serviceWorker' in navigator && !window.__electronAPI) {
 
 // ─── 起動 ────────────────────────────────────────────────────────────
 
-document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('DOMContentLoaded', () => {
+  init().catch(err => {
+    const container = document.getElementById('view-home');
+    if (container) {
+      container.style.display = 'block';
+      container.innerHTML = `<div style="padding:2rem;color:#fff;font-family:sans-serif">
+        <h2>⚠️ Startup Error</h2>
+        <pre style="white-space:pre-wrap;font-size:12px;margin-top:1rem">${err?.stack || err}</pre>
+      </div>`;
+    }
+    console.error('init() failed:', err);
+  });
+});

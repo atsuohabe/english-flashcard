@@ -86,7 +86,7 @@
   animation: fadeIn 300ms ease forwards;
 }
 
-.view--active {
+.view.active {
   display: block;
 }
 
@@ -149,12 +149,12 @@
   color: var(--color-text);
 }
 
-.nav-bottom__item--active {
+.nav-bottom__item.active {
   color: var(--color-primary);
   font-weight: 600;
 }
 
-.nav-bottom__item--active::after {
+.nav-bottom__item.active::after {
   content: '';
   position: absolute;
   top: 0;
@@ -257,7 +257,7 @@
   color: var(--color-text);
 }
 
-.nav-sidebar__item--active {
+.nav-sidebar__item.active {
   background: var(--color-primary-light);
   color: var(--color-primary);
   font-weight: 600;
@@ -406,7 +406,7 @@
 
 /* ===== Dark Mode Nav Overrides ===== */
 [data-theme="dark"] .nav-bottom {
-  background: rgba(30, 30, 30, 0.90);
+  background: rgba(15, 23, 42, 0.92);
   border-top-color: var(--color-border);
 }
 
@@ -417,7 +417,7 @@
 
 @media (prefers-color-scheme: dark) {
   .nav-bottom {
-    background: rgba(30, 30, 30, 0.90);
+    background: rgba(15, 23, 42, 0.92);
   }
 }
 

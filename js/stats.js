@@ -77,7 +77,7 @@ export function renderStats(container) {
   const overview = getOverview();
   const counts = getCardStateCounts();
   const forecast = getForecast(14);
-  const heatmap = getHeatmapData();
+  const heatmap = getHeatmapData(90);
   const retention = getRetentionRate();
 
   container.innerHTML = '';
@@ -88,7 +88,7 @@ export function renderStats(container) {
   // タイトル
   const title = document.createElement('h1');
   title.className = 'page-title';
-  title.textContent = '統計';
+  title.textContent = 'Stats';
   page.appendChild(title);
 
   // 概要グリッド
@@ -96,51 +96,23 @@ export function renderStats(container) {
   grid.className = 'stats-grid';
   grid.innerHTML = `
     <div class="stat-tile">
-      <div class="stat-tile__number" data-stat="reviewed">${overview.totalReviewed.toLocaleString()}</div>
-      <div class="stat-tile__label">復習回数</div>
+      <div class="stat-tile__value" data-stat="reviewed">${overview.totalReviewed.toLocaleString()}</div>
+      <div class="stat-tile__label">Reviews</div>
     </div>
     <div class="stat-tile">
-      <div class="stat-tile__number" data-stat="mastered">${overview.mastered}</div>
-      <div class="stat-tile__label">習得済み</div>
+      <div class="stat-tile__value" data-stat="mastered">${overview.mastered}</div>
+      <div class="stat-tile__label">Mastered</div>
     </div>
     <div class="stat-tile">
-      <div class="stat-tile__number" data-stat="streak">${overview.streak}</div>
-      <div class="stat-tile__label">連続日数</div>
+      <div class="stat-tile__value" data-stat="streak">${overview.streak}</div>
+      <div class="stat-tile__label">Day Streak</div>
     </div>
     <div class="stat-tile">
-      <div class="stat-tile__number" data-stat="time">${overview.totalMinutes}</div>
-      <div class="stat-tile__label">学習時間(分)</div>
+      <div class="stat-tile__value" data-stat="time">${overview.totalMinutes}</div>
+      <div class="stat-tile__label">Minutes</div>
     </div>
   `;
   page.appendChild(grid);
-
-  // プログレスリング
-  const ringSection = document.createElement('div');
-  ringSection.className = 'progress-ring-container';
-  ringSection.style.marginTop = 'var(--space-6)';
-
-  const totalWords = overview.totalWords || 1;
-  const masteredPct = Math.round((overview.mastered / totalWords) * 100);
-  const learningPct = Math.round((overview.learning / totalWords) * 100);
-
-  const circumference = 2 * Math.PI * 65;
-  const masteredOffset = circumference * (1 - masteredPct / 100);
-  const learningOffset = circumference * (1 - (masteredPct + learningPct) / 100);
-
-  ringSection.innerHTML = `
-    <svg class="progress-ring" viewBox="0 0 160 160">
-      <circle class="progress-ring__bg" cx="80" cy="80" r="65"/>
-      <circle class="progress-ring__track--learning" cx="80" cy="80" r="65"
-        stroke-dasharray="${circumference}" stroke-dashoffset="${learningOffset}"/>
-      <circle class="progress-ring__track--mastered" cx="80" cy="80" r="65"
-        stroke-dasharray="${circumference}" stroke-dashoffset="${masteredOffset}"/>
-      <g class="progress-ring__text" transform="rotate(90 80 80)">
-        <text class="progress-ring__number" x="80" y="75">${overview.mastered}</text>
-        <text class="progress-ring__label" x="80" y="95">/ ${totalWords} 語</text>
-      </g>
-    </svg>
-  `;
-  page.appendChild(ringSection);
 
   // カード状態ブレークダウン
   const breakdown = document.createElement('div');
@@ -148,20 +120,20 @@ export function renderStats(container) {
   breakdown.style.marginTop = 'var(--space-6)';
 
   const stateLabels = [
-    { state: STATE.NEW, label: '未学習', color: '#D8D8D8' },
-    { state: STATE.LEARNING, label: '学習中', color: '#9E9E9E' },
-    { state: STATE.YOUNG, label: '覚えた（練習中）', color: '#616161' },
-    { state: STATE.MATURE, label: '習得済み', color: '#1A1A1A' },
-    { state: STATE.BURNED, label: '完全定着', color: '#000000' },
+    { state: STATE.NEW, label: 'New', color: '#CBD5E1' },
+    { state: STATE.LEARNING, label: 'Learning', color: '#93C5FD' },
+    { state: STATE.YOUNG, label: 'Remembered (practicing)', color: '#60A5FA' },
+    { state: STATE.MATURE, label: 'Mastered', color: '#2563EB' },
+    { state: STATE.BURNED, label: 'Fully retained', color: '#1D4ED8' },
   ];
 
   let breakdownHTML = '<div class="donut-legend">';
   for (const { state, label, color } of stateLabels) {
     breakdownHTML += `
       <div class="donut-legend__item">
-        <span class="donut-legend__dot" style="background:${color}"></span>
-        <span>${label}</span>
-        <span class="donut-legend__count">${counts[state] || 0}</span>
+        <span class="donut-legend__color" style="background:${color}"></span>
+        <span class="donut-legend__label">${label}</span>
+        <span class="donut-legend__value">${counts[state] || 0}</span>
       </div>
     `;
   }
@@ -175,12 +147,12 @@ export function renderStats(container) {
   forecastSection.style.marginTop = 'var(--space-6)';
 
   const maxForecast = Math.max(1, ...forecast.map(f => f.count));
-  let forecastHTML = '<div class="section-header"><h3 class="section-title">今後14日の復習予測</h3></div>';
-  forecastHTML += '<div class="forecast-chart">';
+  let forecastHTML = '<div class="section-header"><h3 class="section-title">Review forecast (14 days)</h3></div>';
+  forecastHTML += '<div class="forecast-chart__bars">';
   for (let i = 0; i < forecast.length; i++) {
     const pct = Math.round((forecast[i].count / maxForecast) * 100);
     const isToday = i === 0;
-    forecastHTML += `<div class="forecast-bar${isToday ? ' today' : ''}" style="height:${Math.max(2, pct)}%" title="${forecast[i].count}枚"></div>`;
+    forecastHTML += `<div class="forecast-chart__bar${isToday ? ' forecast-chart__bar--today' : ''}" style="height:${Math.max(2, pct)}%"><span class="forecast-chart__bar-tooltip">${forecast[i].count}</span></div>`;
   }
   forecastHTML += '</div>';
   forecastSection.innerHTML = forecastHTML;
@@ -191,16 +163,16 @@ export function renderStats(container) {
   heatmapSection.className = 'surface-card surface-card--sm';
   heatmapSection.style.marginTop = 'var(--space-6)';
 
-  let heatmapHTML = '<div class="section-header"><h3 class="section-title">学習カレンダー</h3></div>';
-  heatmapHTML += '<div class="heatmap">';
+  let heatmapHTML = '<div class="section-header"><h3 class="section-title">Activity (90 days)</h3></div>';
+  heatmapHTML += '<div class="heatmap-grid">';
   // 先頭の空セルで曜日を揃える
   const firstDate = new Date(heatmap[0]?.date || new Date());
   const startDay = firstDate.getDay();
   for (let i = 0; i < startDay; i++) {
-    heatmapHTML += '<div class="heatmap__cell heatmap__cell--empty"></div>';
+    heatmapHTML += '<div class="heatmap__day" style="opacity:0"></div>';
   }
   for (const day of heatmap) {
-    heatmapHTML += `<div class="heatmap__cell" data-level="${day.level}" title="${new Date(day.date).toLocaleDateString('ja-JP')}: ${day.count}回"></div>`;
+    heatmapHTML += `<div class="heatmap__day heatmap__day--level-${day.level}" title="${new Date(day.date).toLocaleDateString('en-US')}: ${day.count}"></div>`;
   }
   heatmapHTML += '</div>';
   heatmapSection.innerHTML = heatmapHTML;

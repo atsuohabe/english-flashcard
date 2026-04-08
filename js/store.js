@@ -23,6 +23,7 @@ const DEFAULT_SETTINGS = {
   ttsRate: 1.0,
   studyLevel: 'all',
   cardOrder: 'sequential',
+  showFurigana: false,
 };
 
 // ─── 公開 API ────────────────────────────────────────────────────────

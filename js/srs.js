@@ -244,9 +244,9 @@ function addDays(date, days) {
 }
 
 export function intervalToLabel(days) {
-  if (days === 0) return '今日';
-  if (days === 1) return '1日後';
-  if (days < 7) return `${days}日後`;
-  if (days < 30) return `${Math.round(days / 7)}週後`;
-  return `${Math.round(days / 30)}ヶ月後`;
+  if (days === 0) return 'Today';
+  if (days === 1) return '1 day';
+  if (days < 7) return `${days} days`;
+  if (days < 30) return `${Math.round(days / 7)} weeks`;
+  return `${Math.round(days / 30)} months`;
 }
