@@ -241,9 +241,14 @@ export class Flashcard {
       exEl.style.display = 'none';
     }
 
-    // アニメーション
-    this._card.style.animation = 'slideInRight 0.3s ease';
-    setTimeout(() => { this._card.style.animation = ''; }, 300);
+    // アニメーション — CSS クラスで管理し animationend で確実にクリーンアップ
+    this._card.classList.remove('card--enter');
+    // 強制リフロー: クラス削除 → 再追加で毎回アニメーションをトリガー
+    void this._card.offsetWidth;
+    this._card.classList.add('card--enter');
+    this._card.addEventListener('animationend', () => {
+      this._card.classList.remove('card--enter');
+    }, { once: true });
 
     // 自動音声
     if (settings.autoplayAudio) {
