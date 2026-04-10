@@ -5,23 +5,21 @@
   perspective: 1200px;
   width: 100%;
   max-width: 400px;
-  margin: 0 auto;
-  aspect-ratio: 3 / 4;
-  max-height: 400px;
+  margin: var(--space-2) auto var(--space-3);
+  /* aspect-ratio を廃止し flex:1 で残り領域を埋める */
+  flex: 1 1 auto;
+  min-height: 200px;
+  max-height: 420px;
   position: relative;
   z-index: 1;
-}
-
-@media (max-height: 700px) {
-  .card-scene {
-    max-height: 320px;
-  }
+  overflow: hidden;
+  border-radius: var(--radius-xl);
 }
 
 @media (min-width: 768px) {
   .card-scene {
     max-width: 420px;
-    max-height: 440px;
+    max-height: 460px;
   }
 }
 
@@ -478,18 +476,25 @@
   max-width: 280px;
 }
 
+/* ===== Study View: 明示的な高さを与えてボタン重なりを解消 ===== */
+#view-study.active {
+  /* 画面いっぱい - ボトムナビ分を引く */
+  height: calc(100dvh - var(--nav-bottom-height, 64px));
+  overflow: hidden;
+}
+
 /* ===== Study Layout Wrapper ===== */
 .study-layout {
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
-  padding: var(--space-3) var(--space-4) calc(var(--space-6) + env(safe-area-inset-bottom, 0px));
-  gap: var(--space-3);
-  min-height: 100%;
+  height: 100%;            /* 親の高さ(100dvh - nav)を継承 */
+  padding: var(--space-3) var(--space-4) 0;
+  gap: 0;
   box-sizing: border-box;
-  /* カードの3D変換がボタンに影響しないよう isolation を指定 */
   isolation: isolate;
+  overflow: hidden;
 }
 
 /* ===== Study Container ===== */
@@ -664,15 +669,15 @@
 /* ===== Rating Container ===== */
 .rating-container {
   display: none;
-  gap: var(--space-3);
+  gap: var(--space-4);
   justify-content: center;
-  margin-top: var(--space-3);
-  padding: var(--space-2) var(--space-4) var(--space-4);
+  /* カード下のボタン領域: safe-area対応 */
+  padding: var(--space-3) var(--space-4) calc(var(--space-4) + env(safe-area-inset-bottom, 0px));
   width: 100%;
-  max-width: 400px;
-  flex-shrink: 0;
+  max-width: 440px;
+  flex-shrink: 0;   /* 絶対に縮まない */
   position: relative;
-  z-index: 10;
+  z-index: 20;
 }
 
 .rating-container.visible {
@@ -708,6 +713,7 @@
   border-radius: var(--radius-full);
   overflow: hidden;
   margin-bottom: var(--space-3);
+  flex-shrink: 0;
 }
 
 .study-progress-bar__fill {

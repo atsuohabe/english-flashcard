@@ -3,7 +3,7 @@
  * オフライン対応のためのキャッシュ戦略
  */
 
-const CACHE_NAME = 'efc-v7';
+const CACHE_NAME = 'efc-v8';
 
 // ベースパスを動的に検出
 const BASE = new URL('./', self.location.href).pathname;
@@ -89,7 +89,7 @@ self.addEventListener('fetch', (event) => {
       })
       .catch(() =>
         caches.match(event.request).then(cached =>
-          cached || new Response('オフラインです。', { status: 503 })
+          cached || new Response('You are offline.', { status: 503 })
         )
       )
   );

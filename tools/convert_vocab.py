@@ -11,6 +11,23 @@ Excel (英単語マスタ) → vocab JSON 変換スクリプト
 """
 import argparse, json, re, sys
 from pathlib import Path
+from pykakasi import kakasi as _Kakasi
+
+# ────────────────────────────────────────────────
+# かな変換（pykakasi）
+# ────────────────────────────────────────────────
+_kks = _Kakasi()
+
+def to_kana(text: str) -> str:
+    """漢字混じりテキストをひらがなに変換する（改行を保持）"""
+    if not text:
+        return ""
+    lines = text.split("\n")
+    kana_lines = []
+    for line in lines:
+        result = _kks.convert(line)
+        kana_lines.append("".join(item["hira"] for item in result))
+    return "\n".join(kana_lines)
 
 # ────────────────────────────────────────────────
 # 品詞マッピング（日本語 → 英語）
@@ -153,7 +170,7 @@ def read_xls(path: Path) -> list[dict]:
                 "id":               word_id,
                 "word":             word_text,
                 "meaning_ja":       meaning_ja,
-                "meaning_kana":     "",
+                "meaning_kana":     to_kana(meaning_ja),
                 "part_of_speech":   pos,
                 "category":         "general",
                 "example_sentence": example,
@@ -253,7 +270,7 @@ def read_xlsx(path: Path) -> list[dict]:
                 "id":               word_id,
                 "word":             word_text,
                 "meaning_ja":       meaning_ja,
-                "meaning_kana":     "",
+                "meaning_kana":     to_kana(meaning_ja),
                 "part_of_speech":   pos,
                 "category":         "general",
                 "example_sentence": example,
