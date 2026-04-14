@@ -481,6 +481,8 @@
   /* 画面いっぱい - ボトムナビ分を引く */
   height: calc(100dvh - var(--nav-bottom-height, 64px));
   overflow: hidden;
+  /* .view の fadeIn がカードの slideInRight と二重アニメーションになるのを防ぐ */
+  animation: none;
 }
 
 /* ===== Study Layout Wrapper ===== */
