@@ -185,6 +185,9 @@ export class Flashcard {
   render(wordData, { total, current, isNew } = {}) {
     this._currentWord = wordData;
     this._isFlipped = false;
+
+    // フリップ戻りの transition が card--enter と重なるのを防ぐため一時無効化
+    this._card.style.transition = 'none';
     this._card.classList.remove('is-flipped', 'dismiss-right', 'dismiss-left');
     this._ratingContainer.classList.remove('visible');
 
@@ -243,8 +246,10 @@ export class Flashcard {
 
     // アニメーション — CSS クラスで管理し animationend で確実にクリーンアップ
     this._card.classList.remove('card--enter');
-    // 強制リフロー: クラス削除 → 再追加で毎回アニメーションをトリガー
+    // 強制リフロー: transition:none を確定 + アニメーション再起動のトリガー
     void this._card.offsetWidth;
+    // transition を復元してからアニメーション開始（フリップには引き続き使われる）
+    this._card.style.transition = '';
     this._card.classList.add('card--enter');
     this._card.addEventListener('animationend', () => {
       this._card.classList.remove('card--enter');
