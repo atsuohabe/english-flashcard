@@ -1,6 +1,31 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="80" fill="#1A1A1A"/>
-  <text x="256" y="200" font-family="Arial,Helvetica,sans-serif" font-size="160" font-weight="bold" fill="#FFFFFF" text-anchor="middle" dominant-baseline="middle">ABC</text>
-  <rect x="120" y="280" width="272" height="8" rx="4" fill="#666"/>
-  <text x="256" y="370" font-family="Arial,Helvetica,sans-serif" font-size="60" font-weight="600" fill="#AAAAAA" text-anchor="middle" dominant-baseline="middle">英単語</text>
+  <!-- App icon background -->
+  <rect width="512" height="512" rx="96" fill="#2563EB"/>
+
+  <!-- Book body (white cover) -->
+  <rect x="104" y="88" width="304" height="336" rx="20" fill="#FFFFFF"/>
+
+  <!-- Spine (left side) -->
+  <rect x="104" y="88" width="48" height="336" rx="20" fill="#1D4ED8"/>
+  <rect x="128" y="88" width="24" height="336" fill="#1D4ED8"/>
+
+  <!-- Top accent band -->
+  <rect x="152" y="88" width="256" height="72" fill="#DBEAFE"/>
+  <rect x="152" y="140" width="256" height="20" fill="#DBEAFE"/>
+
+  <!-- Large "Aa" on cover -->
+  <text
+    x="282" y="300"
+    font-family="Georgia,'Times New Roman',serif"
+    font-size="112" font-weight="700"
+    fill="#1D4ED8"
+    text-anchor="middle" dominant-baseline="middle"
+  >Aa</text>
+
+  <!-- Ruled lines (notebook lines) -->
+  <rect x="168" y="364" width="184" height="9" rx="4.5" fill="#BFDBFE"/>
+  <rect x="168" y="388" width="128" height="9" rx="4.5" fill="#BFDBFE"/>
+
+  <!-- Red bookmark ribbon -->
+  <polygon points="336,88 368,88 368,178 352,160 336,178" fill="#EF4444"/>
 </svg>
