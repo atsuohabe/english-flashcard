@@ -1366,6 +1366,10 @@
   margin-top: 2px;
 }
 
+.queue-pill--mastered .queue-pill__number {
+  color: var(--color-success);
+}
+
 /* ===== Session Complete ===== */
 .session-complete {
   display: flex;

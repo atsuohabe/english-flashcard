@@ -195,6 +195,10 @@ function _renderHome() {
             <span class="queue-pill__number">${newCount}</span>
             <span class="queue-pill__label">New</span>
           </div>
+          <div class="queue-pill queue-pill--mastered">
+            <span class="queue-pill__number">${overview.mastered}</span>
+            <span class="queue-pill__label">Mastered</span>
+          </div>
         </div>
 
         <button class="btn btn--primary btn--lg btn--full" data-action="start-study">
